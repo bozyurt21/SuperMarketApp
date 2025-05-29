@@ -2,7 +2,7 @@ import mysql.connector
 import pandas as pd
 import csv
 class dbHandler:
-  def self (__init__):
+  def __init__ (self):
     db_connection = mysql.connector.connect(
                       host="localhost",
                       user="root",
