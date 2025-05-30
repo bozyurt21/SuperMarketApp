@@ -48,7 +48,7 @@ Even though this would be enough for now, for more information you can read look
 
 ## Project Schema
 Since we are using Flask to create this project, there needs to be some changes in the structure of the app. I have decided to do the following structure for the app for it to be more suitable to flask:
-
+```
 supermarketApp/
 ├── app/
 │   ├── app.py
@@ -66,6 +66,7 @@ supermarketApp/
 ├── styles/
 ├── README.md
 └── ...
+```
 
 We are going to use the **template** folder inside the **app** folder to put our **HTML files**. It is actually pretty important since otherwise, the app will not realize our HTML files and will not render as it should. It also brings structure to our app so it would be great to use it for this reason as well.
 
