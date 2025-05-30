@@ -2,9 +2,9 @@
 
 # Contents:
 - [Beginner Guide](#beginner-guide)
-- [Jinja Syntax for Beginners] (#jinja-syntax)
-- [Project Schema] (#project-schema)
-- [HTML Beginning] (#html-beginning)
+- [Jinja Syntax for Beginners](#jinja-syntax)
+- [Project Schema](#project-schema)
+- [HTML Beginning](#html-beginning)
 ## Beginner Guide
 ## Read me syntax
 You can use the following [link](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) to see the README.md syntax.
@@ -88,7 +88,7 @@ As you couls see the only change is instead of using **href="login.html"** we ar
 
 We are now also using Jinja for simplicty. It would be a waste of time and resources to copy paste the navigation bar -which used in nearly every pages- so instead now, we are going to use Jinja. 
 
-You do not need to know the whole jinja, just look at the ones in [here] (#jinja-syntax) if you are feeling out of blue, that would be enough.
+You do not need to know the whole jinja, just look at the ones in [here](#jinja-syntax) if you are feeling out of blue, that would be enough.
 
 Every page in our template folder is going to beggin as follows:
 ```
