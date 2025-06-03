@@ -10,8 +10,12 @@
 # Contents:
 
 - [Beginner Guide](#beginner-guide)
+<<<<<<< HEAD
 - [How To Run The App]
 >>>>>>> 8334de4 (Added the README file with HTML beginning and How to Run the app changes. I couldn't find the project schema)
+=======
+- [How To Run The App](#how-to-run-the-app)
+>>>>>>> 02d8082 (Update README.md)
 - [Jinja Syntax for Beginners](#jinja-syntax)
 - [HTML Beginning](#html-beginning)
 
