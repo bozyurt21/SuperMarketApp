@@ -12452,6 +12452,61 @@ section,
   margin: 1.5rem 0;
 }
 
+.btn-shop {
+  background-color: #8c0d4f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+.btn-shop:hover {
+  background-color: #a61763;
+  color: white;
+}
+
+.btn-discover {
+  background: linear-gradient(90deg, #8c0d4f, #a61763);
+  color: white;
+  padding: 14px 30px;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(140, 13, 79, 0.3);
+}
+
+.btn-discover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(140, 13, 79, 0.5);
+  color: white;
+}
+
+.intro-highlight {
+  background-color: #f9f9f9;
+  padding: 60px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.intro-highlight h2 {
+  font-weight: 600;
+  color: #8c0d4f;
+}
+
+.intro-highlight p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+
 .pricing-range-widget .price-range-container .range-slider .slider-track {
   position: absolute;
   width: 100%;
