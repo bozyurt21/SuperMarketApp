@@ -1,5 +1,6 @@
 # SuperMarketApp
 
+<<<<<<< HEAD
 # Contents:
 
 - [Beginner Guide](#beginner-guide)
@@ -9,6 +10,8 @@
 
 ## Beginner Guide
 
+=======
+>>>>>>> b620db8 (Revert "Update README.md")
 ## Read me syntax
 
 You can use the following [link](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) to see the README.md syntax.
