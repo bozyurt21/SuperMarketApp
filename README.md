@@ -1,17 +1,27 @@
 # SuperMarketApp
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Contents:
 
 - [Beginner Guide](#beginner-guide)
 - [How To Run The App](#how-to-run-the-app)
+=======
+# Contents:
+
+- [Beginner Guide](#beginner-guide)
+- [How To Run The App]
+>>>>>>> 8334de4 (Added the README file with HTML beginning and How to Run the app changes. I couldn't find the project schema)
 - [Jinja Syntax for Beginners](#jinja-syntax)
 - [HTML Beginning](#html-beginning)
 
 ## Beginner Guide
 
+<<<<<<< HEAD
 =======
 >>>>>>> b620db8 (Revert "Update README.md")
+=======
+>>>>>>> 8334de4 (Added the README file with HTML beginning and How to Run the app changes. I couldn't find the project schema)
 ## Read me syntax
 
 You can use the following [link](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) to see the README.md syntax.
