@@ -3,7 +3,7 @@
 # Contents:
 
 - [Beginner Guide](#beginner-guide)
-- [How To Run The App]
+- [How To Run The App](#how-to-run-the-app)
 - [Jinja Syntax for Beginners](#jinja-syntax)
 - [HTML Beginning](#html-beginning)
 
