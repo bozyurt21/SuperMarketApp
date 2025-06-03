@@ -44,7 +44,6 @@ git push origin <branch-name>
 ```
 git remote add origin <ssh-link>
 ```
-<<<<<<< HEAD
 
 ## How To Run The App
 
@@ -54,13 +53,6 @@ python3 app/app.py
 
 ## Jinja Syntax
 
-=======
-## How to run the app
-```
-python3 app/app.py
-```
-## Jınja Syntax
->>>>>>> f92c29f (Update README.md)
 ### How to extend a page
 
 ```
