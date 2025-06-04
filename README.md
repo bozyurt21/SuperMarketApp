@@ -1,9 +1,19 @@
 # SuperMarketApp
 
+<<<<<<< HEAD
+
+<<<<<<< HEAD
+
 # Contents:
 
 - [Beginner Guide](#beginner-guide)
-- [How To Run The App](#how-to-run-the-app)
+  <<<<<<< HEAD
+- # [How To Run The App](#how-to-run-the-app)
+  <<<<<<< HEAD
+- # [How To Run The App](#how-to-run-the-app)
+- [How To Run The App]
+  > > > > > > > cef7934 (Added the README file with HTML beginning and How to Run the app changes. I couldn't find the project schema)
+  > > > > > > > ee1c661 (Final README)
 - [Jinja Syntax for Beginners](#jinja-syntax)
 - [HTML Beginning](#html-beginning)
 
@@ -28,6 +38,24 @@ git push origin <branch-name>
 git remote add origin <ssh-link>
 ```
 
+<<<<<<< HEAD
+
+=======
+
+<<<<<<< HEAD
+
+## How to run the app
+
+```
+python3 app/app.py
+```
+
+## Jınja Syntax
+
+=======
+
+> > > > > > > ee1c661 (Final README)
+
 ## How To Run The App
 
 ```
@@ -35,6 +63,12 @@ python3 app/app.py
 ```
 
 ## Jinja Syntax
+
+# <<<<<<< HEAD
+
+> > > > > > > e4d2c23 (Added the README file with HTML beginning and How to Run the app changes. I couldn't find the project schema)
+
+> > > > > > > ee1c661 (Final README)
 
 ### How to extend a page
 
