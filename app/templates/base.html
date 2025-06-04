@@ -63,10 +63,16 @@
             <!-- Account -->
             
             <!-- Simple Login/Register Links -->
+            {% if session.user_name %}
+            <div class="d-flex align-items-center">
+              <p>Welcome, {{ session.user_name }}! <a href="{{ url_for('logout') }}">Logout</a></p>
+            </div>
+            {% else %}
             <div class="d-flex align-items-center">
               <a href="{{ url_for('login') }}" class="btn me-2" style="background-color: #8c0d4f; color: white;">Login</a>
               <a href="{{ url_for('register') }}" class="btn" style="background-color: #8c0d4f; color: white;">Register</a>
             </div>
+            {%endif%}
 
 
 
@@ -155,7 +161,7 @@
       <div class="container-fluid container-xl position-relative">
         <nav id="navmenu" class="navmenu">
           <ul>
-            <li><a href="{{ url_for('login') }}">Home</a></li>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
             
             <li class="dropdown"><a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
@@ -482,6 +488,18 @@
   </header>
   
   <!--We are going to put our items in here-->
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
   {%block content%}
   {%endblock%}
 
