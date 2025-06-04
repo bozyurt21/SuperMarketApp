@@ -1,20 +1,16 @@
-{% extends 'base.html' %}
-{% block title %}Home{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content
+%}
 <main class="main">
-
   <!-- Hero Section -->
-<section class="intro-highlight text-center py-5">
-  <div class="container">
-    <h2 class="mb-3">Discover our latest items</h2>
-    <p class="lead">High-quality items just for you. Shop with ease and confidence.</p>
-    <a href="#best-sellers" class="btn-discover mt-3">Shop Now</a>
-
-
-  </div>
-</section>
-
+  <section class="intro-highlight text-center py-5">
+    <div class="container">
+      <h2 class="mb-3">Discover our latest items</h2>
+      <p class="lead">
+        High-quality items just for you. Shop with ease and confidence.
+      </p>
+      <a href="#best-sellers" class="btn-discover mt-3">Shop Now</a>
+    </div>
+  </section>
 
   <!-- Features Section -->
   <section class="features py-5">
@@ -53,59 +49,55 @@
   </section>
 
   <!-- Best Sellers Section: Just for visual purposes -->
-<section id="best-sellers" class="py-5">
-  <div class="container">
-    <h2 class="text-center mb-4">Best Sellers</h2>
-    <div class="row g-4">
+  <section id="best-sellers" class="py-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Best Sellers</h2>
+      <div class="row g-4">
+        <!-- Product 1 -->
+        <div class="col-md-3 col-sm-6">
+          <div class="card h-100 text-center p-3">
+            <div class="card-body">
+              <h5 class="card-title">Frozen Pizza</h5>
+              <p class="card-text">₺24</p>
+              <a href="#" class="btn-shop">Shop Now</a>
+            </div>
+          </div>
+        </div>
 
-      <!-- Product 1 -->
-      <div class="col-md-3 col-sm-6">
-        <div class="card h-100 text-center p-3">
-          <div class="card-body">
-            <h5 class="card-title">Frozen Pizza</h5>
-            <p class="card-text">₺24</p>
-            <a href="#" class="btn-shop">Shop Now</a>
+        <!-- Product 2 -->
+        <div class="col-md-3 col-sm-6">
+          <div class="card h-100 text-center p-3">
+            <div class="card-body">
+              <h5 class="card-title">Chocolate Muffin</h5>
+              <p class="card-text">₺46</p>
+              <a href="#" class="btn-shop">Shop Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="col-md-3 col-sm-6">
+          <div class="card h-100 text-center p-3">
+            <div class="card-body">
+              <h5 class="card-title">Milk</h5>
+              <p class="card-text">₺27</p>
+              <a href="#" class="btn-shop">Shop Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="col-md-3 col-sm-6">
+          <div class="card h-100 text-center p-3">
+            <div class="card-body">
+              <h5 class="card-title">Potato Chips</h5>
+              <p class="card-text">₺37</p>
+              <a href="#" class="btn-shop">Shop Now</a>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- Product 2 -->
-      <div class="col-md-3 col-sm-6">
-        <div class="card h-100 text-center p-3">
-          <div class="card-body">
-            <h5 class="card-title">Chocolate Muffin</h5>
-            <p class="card-text">₺46</p>
-            <a href="#" class="btn-shop">Shop Now</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 3 -->
-      <div class="col-md-3 col-sm-6">
-        <div class="card h-100 text-center p-3">
-          <div class="card-body">
-            <h5 class="card-title">Milk</h5>
-            <p class="card-text">₺27</p>
-            <a href="#" class="btn-shop">Shop Now</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 4 -->
-      <div class="col-md-3 col-sm-6">
-        <div class="card h-100 text-center p-3">
-          <div class="card-body">
-            <h5 class="card-title">Potato Chips</h5>
-            <p class="card-text">₺37</p>
-            <a href="#" class="btn-shop">Shop Now</a>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
-
-
+  </section>
 </main>
 {% endblock %}
