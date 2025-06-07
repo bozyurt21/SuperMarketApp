@@ -1,0 +1,99 @@
+{%extends 'base.html'%}{%block title%}Add Item{%endblock%}{%block content%}
+<main class="main">
+  <!-- Page Title -->
+  <div class="page-title light-background position-relative">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="login.html">Home</a></li>
+          <li class="current">Add Item</li>
+        </ol>
+      </nav>
+      <h1>Add Item</h1>
+    </div>
+  </div>
+  <!-- End Page Title -->
+
+  <!-- Login Section -->
+  <section id="item" class="item section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8" data-aos="zoom-in" data-aos-delay="200">
+          <div class="login-form-wrapper">
+            <div class="login-header text-center">
+              <h2>Add Item</h2>
+            </div>
+
+            <form method="POST">
+              <div class="mb-4">
+                <label for="name" class="form-label">Image</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="image"
+                  name="image"
+                  placeholder="Enter the name of the product"
+                  required=""
+                  accept="image/*"
+                />
+              </div>
+              <div class="mb-4">
+                <label for="name" class="form-label">Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  name="name"
+                  placeholder="Enter the name of the product"
+                  required=""
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="price"
+                  name="price"
+                  placeholder="Enter the price"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="stock" class="form-label">Stock</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="stock"
+                  name="stock"
+                  placeholder="Enter the stock"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="" class="form-label">Category</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="category"
+                  name="category"
+                  placeholder="Enter the category ID"
+                  required
+                />
+              </div>
+
+              <div class="d-grid gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                  Add Product
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /Login Section -->
+</main>
+{%endblock%}
