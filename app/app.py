@@ -2,7 +2,6 @@ from flask import Flask, flash, redirect, render_template, request, url_for, ses
 import mysql.connector
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 import secrets
 
 
@@ -15,10 +14,9 @@ def get_connection():
         host="localhost",
         user="root",
         password="0079306",
-        database="supermarket"
+        database="supermarketApp"
     )
-db = get_connection()
-cursor = db.cursor(dictionary=True)
+
 
 
 
@@ -31,23 +29,41 @@ def home():
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
-        password = request.form.get('password')
+        password = request.form.get('password', '')
 
-        cursor.execute("SELECT * FROM customer WHERE email = %s", (email,))
-        user = cursor.fetchone()
+        try:
+            db = get_connection()
+            cursor = db.cursor(dictionary=True)
 
-        if user and check_password_hash(user['password'], password):
-            session['user_email'] = user['email']
-            session['user_name'] = user['fname']
-            flash('Login successful')
-            return redirect(url_for('home'))
-        else:
-            flash('Invalid email or password. Please try again :(')
+            cursor.execute("SELECT * FROM customer WHERE email = %s;", (email,))
+            user = cursor.fetchone()
+
+            if user:
+                db_password = user["password"]
+                if check_password_hash(db_password, password):
+                    session['user_email'] = user['email']
+                    session['user_name'] = user['fname']
+                    flash('Login successful')
+                    return redirect(url_for('home'))
+                else:
+                    flash('Incorrect password.')
+            else:
+                flash('No account found with that email.')
+
+        except Exception as e:
+            flash('Something went wrong. Try again.')
+
+        finally:
+            cursor.close()
+            db.close()
 
     return render_template('login.html')
 
+
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
     if request.method == 'POST':
         fname = request.form['firstName']
         lname = request.form['lastName']
@@ -78,8 +94,25 @@ def register():
 
         flash('Registration successful! You are now logged in.')
         return redirect(url_for('home'))
-
+    cursor.close()
+    db.close()
     return render_template('register.html')
+@app.route('/addProduct', methods =['POST', 'GET'] )
+def addProduct():
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+    if request.method == "POST":
+        name = request.form.get("name")
+        price = request.form.get("price")
+        stock = request.form.get("stock")
+        category = request.form.get("category")
+        image_file = request.files.get("image")
+        image_data = image_file.read() if image_file else None
+        cursor.execute("INSERT INTO product (name, price, stock, category_id,image) VALUES (%s, %s, %s, %s, %s);", (name, price, stock, category, image_data))
+        db.commit()
+    cursor.close()
+    db.close()
+    return render_template("addProduct.html")
 
 @app.route('/logout')
 def logout():
