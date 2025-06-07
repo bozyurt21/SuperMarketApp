@@ -28,13 +28,6 @@ git push origin <branch-name>
 git remote add origin <ssh-link>
 ```
 
-## How to run the app
-
-```
-python3 app/app.py
-```
-
-## Jınja Syntax
 
 ## How To Run The App
 
