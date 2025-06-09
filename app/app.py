@@ -18,8 +18,6 @@ def get_connection():
         database="supermarketApp"
     )
 # To serve the image
-
-
 @app.route('/product_image/<int:product_id>')
 def product_image(product_id):
     db = get_connection()
