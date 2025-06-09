@@ -88,20 +88,20 @@
           <div class="cart-summary">
             <h4 class="summary-title">Order Summary</h4>
 
-            <div class="summary-item"><span class="summary-label">Subtotal</span><span class="summary-value">${{ subtotal }}</span></div>
+            <div class="summary-item"><span class="summary-label">Subtotal</span><span class="summary-value">₺{{ subtotal }}</span></div>
             <div class="summary-item shipping-item">
               <span class="summary-label">Shipping</span>
               <div class="shipping-options text-end">
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="shipping" id="standard" checked>
-                  <label class="form-check-label" for="standard">Standard Delivery - $4.99</label>
+                  <label class="form-check-label" for="standard">Standard Delivery - ₺39.90</label>
                 </div>
               </div>
             </div>
 
             <div class="summary-total">
               <span class="summary-label">Total</span>
-              <span class="summary-value">${{ total }}</span>
+              <span class="summary-value">₺{{ total }}</span>
             </div>
 
             <div class="checkout-button">
