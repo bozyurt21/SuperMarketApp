@@ -65,8 +65,8 @@
             <!-- Simple Login/Register Links -->
             {% if session.user_name %}
             <div class="d-flex align-items-center">
-              <p>Welcome, {{ session.user_name }}! <a href="{{ url_for('logout') }} " class="btn me-2" style="background-color: #8c0d4f; color: white;">Logout</a></p>
-              <a href="{{ url_for('addProduct') }} " class="btn me-2" style="background-color: #8c0d4f; color: white;">Add Product</a>
+              <p>Welcome, {{ session.user_name }}! <a href="{{ url_for('logout') }} " class="btn me-2" style="background-color: #8c0d4f; color: white;">Logout</a><a href="{{ url_for('addProduct') }} " class="btn me-2" style="background-color: #8c0d4f; color: white;">Add Product</a></p>
+              
               
             </div>
             {% else %}
