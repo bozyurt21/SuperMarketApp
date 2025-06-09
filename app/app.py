@@ -120,7 +120,7 @@ def register():
 @app.route('/addProduct', methods =['POST', 'GET'] )
 def addProduct():
     db = get_connection()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor()
     if request.method == "POST":
         name = request.form.get("name")
         price = request.form.get("price")
@@ -132,9 +132,11 @@ def addProduct():
         print("Image data size:", len(image_data) if image_data else "No image")
         cursor.execute("INSERT INTO product (name, price, stock, category_id,image) VALUES (%s, %s, %s, %s, %s);", (name, price, stock, category, image_data))
         db.commit()
+    cursor.execute("SELECT * FROM category;")
+    categories = cursor.fetchall()
     cursor.close()
     db.close()
-    return render_template("addProduct.html")
+    return render_template("addProduct.html", categories=categories)
 
 @app.route('/logout')
 def logout():
