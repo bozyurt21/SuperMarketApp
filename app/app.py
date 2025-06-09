@@ -143,7 +143,13 @@ def logout():
     session.clear()
     flash('You have been logged out.')
     return redirect(url_for('login'))
-    
+
+@app.route('/cart')
+def cart():
+    return render_template("cart.html")
+@app.route('/checkout')
+def checkout():
+    return render_template("checkout.html")
 if __name__ == '__main__':
     app.run(debug=True)
 
