@@ -48,29 +48,115 @@
     </div>
   </section>
 
-  <!-- Best Sellers Section: Just for visual purposes -->
   <section id="best-sellers" class="py-5">
-    <div class="container">
-      <h2 class="text-center mb-4">Best Sellers</h2>
-      <div class="row g-4">
-        <!-- Product 1 -->
-        {%for product in products%}
-        <div class="col-md-3 col-sm-6">
-          <div class="card h-100 text-center p-3">
-            <img
-              src="{{ url_for('product_image', product_id=product[0]) }}"
-              class="card-img-top"
-              alt="{{product[1]}}"
-              style="height: 200px; object-fit: cover"
-            />
-            <div class="card-body">
-              <h5 class="card-title">{{product[1]}}</h5>
-              <p class="card-text">₺{{product[2]}}</p>
-              <a href="#" class="btn-shop">Shop Now</a>
-            </div>
+    <div class="container mt-4">
+      <h2 class="text-center mb-4">Products</h2>
+      <div class="row">
+        <!-- Filter Sidebar -->
+        <div class="col-lg-3 mb-4">
+          <div class="card p-3">
+            <h5 class="mb-3 text-center">Filter Products</h5>
+            <form method="GET">
+              <!-- Category Filter -->
+              <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" name="category" id="category">
+                  <option value="">All</option>
+                  <option value="Bakery">Bakery</option>
+                  <option value="Beverages">Beverages</option>
+                  <option value="Dairy">Dairy</option>
+                  <option value="Fruits">Fruits</option>
+                  <option value="Snacks">Snacks</option>
+                  <option value="Vegetables">Vegetables</option>
+                  <option value="Meat">Meat</option>
+                  <option value="Seafood">Seafood</option>
+                  <option value="Frozen">Frozen</option>
+                  <option value="Canned">Canned</option>
+                </select>
+              </div>
+
+              <!-- Price Filter -->
+              <div class="mb-3">
+                <label class="form-label">Price Range</label>
+                <div class="d-flex">
+                  <input
+                    type="number"
+                    name="price_min"
+                    class="form-control me-2"
+                    placeholder="Min"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    name="price_max"
+                    class="form-control"
+                    placeholder="Max"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <!-- Sort By -->
+              <div class="mb-3">
+                <label for="sort" class="form-label">Sort By</label>
+                <select class="form-select" name="sort" id="sort">
+                  <option value="popularity">Most Popular</option>
+                  <option value="newest">Newest</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                </select>
+              </div>
+              <div class="form-check mt-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="save_filter"
+                  id="save_filter"
+                />
+                <label class="form-check-label" for="save_filter"
+                  >Save this filter</label
+                >
+              </div>
+              <input
+                type="text"
+                name="filter_name"
+                class="form-control mt-2"
+                placeholder="Name this filter"
+              />
+              <button
+                type="submit"
+                class="btn-shop w-100"
+                style="padding-top: 10px"
+              >
+                Apply Filters
+              </button>
+            </form>
+            <h5 style="text-align: center; padding: 10px">Saved Filters</h5>
           </div>
         </div>
-        {% endfor %}
+
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+          <div class="row g-4">
+            {% for product in products %}
+            <div class="col-md-4 col-sm-6">
+              <div class="card h-100 text-center p-3">
+                <img
+                  src="{{ url_for('product_image', product_id=product[0]) }}"
+                  class="card-img-top"
+                  alt="{{ product[1] }}"
+                  style="height: 200px; object-fit: cover"
+                />
+                <div class="card-body">
+                  <h5 class="card-title">{{ product[1] }}</h5>
+                  <p class="card-text">₺{{ product[2] }}</p>
+                  <a href="#" class="btn-shop">Shop Now</a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
   </section>
