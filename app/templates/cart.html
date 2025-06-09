@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Cart{% endblock %}
+{% block content %}
+
+<main class="main">
+
+  <!-- Page Title -->
+  <div class="page-title light-background">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li class="current">Cart</li>
+        </ol>
+      </nav>
+      <h1>Cart</h1>
+    </div>
+  </div><!-- End Page Title -->
+
+  <!-- Cart Section -->
+  <section id="cart" class="cart section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row">
+
+        <!-- Cart Items -->
+        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+          <div class="cart-items">
+
+            <div class="cart-header d-none d-lg-block">
+              <div class="row align-items-center">
+                <div class="col-lg-6"><h5>Product</h5></div>
+                <div class="col-lg-2 text-center"><h5>Price</h5></div>
+                <div class="col-lg-2 text-center"><h5>Quantity</h5></div>
+                <div class="col-lg-2 text-center"><h5>Total</h5></div>
+              </div>
+            </div>
+
+            <!-- Sample Cart Item -->
+            {% for item in cart_items %}
+            <div class="cart-item">
+              <div class="row align-items-center">
+                <div class="col-lg-6 col-12 mb-3">
+                  <div class="product-info d-flex align-items-center">
+                    <div class="product-image">
+                      <img src="{{ url_for('static', filename=item.image) }}" alt="Product" class="img-fluid">
+                    </div>
+                    <div class="product-details">
+                      <h6 class="product-title">{{ item.title }}</h6>
+                      <div class="product-meta">
+                        <span class="product-color">Color: {{ item.color }}</span>
+                        <span class="product-size">Size: {{ item.size }}</span>
+                      </div>
+                      <button class="remove-item" type="button">
+                        <i class="bi bi-trash"></i> Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-12 text-center">
+                  <span class="current-price">${{ item.price }}</span>
+                </div>
+                <div class="col-lg-2 col-12 text-center">
+                  <div class="quantity-selector">
+                    <button class="quantity-btn decrease"><i class="bi bi-dash"></i></button>
+                    <input type="number" class="quantity-input" value="{{ item.quantity }}" min="1" max="10">
+                    <button class="quantity-btn increase"><i class="bi bi-plus"></i></button>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-12 text-center">
+                  <span>${{ item.total }}</span>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+            <!-- End Sample -->
+
+            <div class="cart-actions">
+              <div class="row">
+                <div class="col-lg-6 mb-3 mb-lg-0">
+                  <div class="coupon-form">
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Coupon code">
+                      <button class="btn btn-outline-accent" type="button">Apply Coupon</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 text-md-end">
+                  <button class="btn btn-outline-heading me-2"><i class="bi bi-arrow-clockwise"></i> Update Cart</button>
+                  <button class="btn btn-outline-remove"><i class="bi bi-trash"></i> Clear Cart</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="300">
+          <div class="cart-summary">
+            <h4 class="summary-title">Order Summary</h4>
+
+            <div class="summary-item"><span class="summary-label">Subtotal</span><span class="summary-value">${{ subtotal }}</span></div>
+            <div class="summary-item shipping-item">
+              <span class="summary-label">Shipping</span>
+              <div class="shipping-options text-end">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="shipping" id="standard" checked>
+                  <label class="form-check-label" for="standard">Standard Delivery - $4.99</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="shipping" id="express">
+                  <label class="form-check-label" for="express">Express Delivery - $12.99</label>
+                </div>
+              </div>
+            </div>
+            <div class="summary-item"><span class="summary-label">Tax</span><span class="summary-value">${{ tax }}</span></div>
+            <div class="summary-item discount"><span class="summary-label">Discount</span><span class="summary-value">-${{ discount }}</span></div>
+
+            <div class="summary-total">
+              <span class="summary-label">Total</span>
+              <span class="summary-value">${{ total }}</span>
+            </div>
+
+            <div class="checkout-button">
+              <a href="{{ url_for('checkout') }}" class="btn btn-accent w-100">
+                Proceed to Checkout <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="continue-shopping">
+              <a href="{{ url_for('home') }}" class="btn btn-link w-100"><i class="bi bi-arrow-left"></i> Continue Shopping</a>
+            </div>
+
+            <div class="payment-methods">
+              <p class="payment-title">We Accept</p>
+              <div class="payment-icons">
+                <i class="bi bi-credit-card"></i>
+                <i class="bi bi-paypal"></i>
+                <i class="bi bi-wallet2"></i>
+                <i class="bi bi-bank"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% endblock %}
