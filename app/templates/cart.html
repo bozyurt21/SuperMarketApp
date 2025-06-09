@@ -74,22 +74,11 @@
             {% endfor %}
             <!-- End Sample -->
 
-            <div class="cart-actions">
-              <div class="row">
-                <div class="col-lg-6 mb-3 mb-lg-0">
-                  <div class="coupon-form">
-                    <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Coupon code">
-                      <button class="btn btn-outline-accent" type="button">Apply Coupon</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 text-md-end">
-                  <button class="btn btn-outline-heading me-2"><i class="bi bi-arrow-clockwise"></i> Update Cart</button>
-                  <button class="btn btn-outline-remove"><i class="bi bi-trash"></i> Clear Cart</button>
-                </div>
-              </div>
-            </div>
+          <div class="text-end mt-4">
+            <button class="btn btn-outline-heading me-2"><i class="bi bi-arrow-clockwise"></i> Update Cart</button>
+            <button class="btn btn-outline-remove"><i class="bi bi-trash"></i> Clear Cart</button>
+          </div>
+
 
           </div>
         </div>
@@ -107,14 +96,8 @@
                   <input class="form-check-input" type="radio" name="shipping" id="standard" checked>
                   <label class="form-check-label" for="standard">Standard Delivery - $4.99</label>
                 </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="shipping" id="express">
-                  <label class="form-check-label" for="express">Express Delivery - $12.99</label>
-                </div>
               </div>
             </div>
-            <div class="summary-item"><span class="summary-label">Tax</span><span class="summary-value">${{ tax }}</span></div>
-            <div class="summary-item discount"><span class="summary-label">Discount</span><span class="summary-value">-${{ discount }}</span></div>
 
             <div class="summary-total">
               <span class="summary-label">Total</span>
@@ -131,16 +114,8 @@
               <a href="{{ url_for('home') }}" class="btn btn-link w-100"><i class="bi bi-arrow-left"></i> Continue Shopping</a>
             </div>
 
-            <div class="payment-methods">
-              <p class="payment-title">We Accept</p>
-              <div class="payment-icons">
-                <i class="bi bi-credit-card"></i>
-                <i class="bi bi-paypal"></i>
-                <i class="bi bi-wallet2"></i>
-                <i class="bi bi-bank"></i>
-              </div>
-            </div>
           </div>
+
         </div>
 
       </div>
