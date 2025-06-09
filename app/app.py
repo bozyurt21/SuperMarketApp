@@ -1,8 +1,9 @@
-from flask import Flask, flash, redirect, render_template, request, url_for, session
+from flask import Flask, flash, redirect, render_template, request, url_for, session, Response
 import mysql.connector
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
+import imghdr
 
 
 app = Flask(__name__)
@@ -16,13 +17,32 @@ def get_connection():
         password="0079306",
         database="supermarketApp"
     )
+# To serve the image
+@app.route('/product_image/<int:product_id>')
+def product_image(product_id):
+    db = get_connection()
+    cursor = db.cursor()
+    cursor.execute("SELECT image FROM product WHERE product_id = %s", (product_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    db.close()
+    if result and result[0]:
+        image_data = result[0]
+        image_type = imghdr.what(None, image_data) or 'jpeg'  # fallback to jpeg
+        return Response(image_data, mimetype=f'image/{image_type}')
+    else:
+        return '', 404
 
 
 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    db = get_connection()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM product;")
+    products = cursor.fetchall()
+    return render_template('index.html', products = products)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,6 +128,8 @@ def addProduct():
         category = request.form.get("category")
         image_file = request.files.get("image")
         image_data = image_file.read() if image_file else None
+        print("Image file:", image_file)
+        print("Image data size:", len(image_data) if image_data else "No image")
         cursor.execute("INSERT INTO product (name, price, stock, category_id,image) VALUES (%s, %s, %s, %s, %s);", (name, price, stock, category, image_data))
         db.commit()
     cursor.close()

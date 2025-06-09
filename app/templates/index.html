@@ -20,28 +20,28 @@
           <div class="feature-box">
             <i class="bi bi-truck fs-1 mb-3"></i>
             <h5>Free Shipping</h5>
-            <p>Etiam vel augue sit amet leo luctus tincidunt.</p>
+            <p>For purchases more than ₺500 we do not demand shipping fee.</p>
           </div>
         </div>
         <div class="col-lg-3 col-md-6">
           <div class="feature-box">
             <i class="bi bi-shield-lock fs-1 mb-3"></i>
             <h5>Secure Payment</h5>
-            <p>Etiam vel augue sit amet leo luctus tincidunt.</p>
+            <p>Your payments securety is estabilished.</p>
           </div>
         </div>
         <div class="col-lg-3 col-md-6">
           <div class="feature-box">
             <i class="bi bi-arrow-repeat fs-1 mb-3"></i>
             <h5>Easy Returns</h5>
-            <p>Etiam vel augue sit amet leo luctus tincidunt.</p>
+            <p>If you did not like the item, you can return it anytime.</p>
           </div>
         </div>
         <div class="col-lg-3 col-md-6">
           <div class="feature-box">
             <i class="bi bi-gift fs-1 mb-3"></i>
             <h5>Special Offers</h5>
-            <p>Etiam vel augue sit amet leo luctus tincidunt.</p>
+            <p>We have speacial offers in every day.</p>
           </div>
         </div>
       </div>
@@ -54,48 +54,23 @@
       <h2 class="text-center mb-4">Best Sellers</h2>
       <div class="row g-4">
         <!-- Product 1 -->
+        {%for product in products%}
         <div class="col-md-3 col-sm-6">
           <div class="card h-100 text-center p-3">
+            <img
+              src="{{ url_for('product_image', product_id=product[0]) }}"
+              class="card-img-top"
+              alt="{{product[1]}}"
+              style="height: 200px; object-fit: cover"
+            />
             <div class="card-body">
-              <h5 class="card-title">Frozen Pizza</h5>
-              <p class="card-text">₺24</p>
+              <h5 class="card-title">{{product[1]}}</h5>
+              <p class="card-text">₺{{product[2]}}</p>
               <a href="#" class="btn-shop">Shop Now</a>
             </div>
           </div>
         </div>
-
-        <!-- Product 2 -->
-        <div class="col-md-3 col-sm-6">
-          <div class="card h-100 text-center p-3">
-            <div class="card-body">
-              <h5 class="card-title">Chocolate Muffin</h5>
-              <p class="card-text">₺46</p>
-              <a href="#" class="btn-shop">Shop Now</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Product 3 -->
-        <div class="col-md-3 col-sm-6">
-          <div class="card h-100 text-center p-3">
-            <div class="card-body">
-              <h5 class="card-title">Milk</h5>
-              <p class="card-text">₺27</p>
-              <a href="#" class="btn-shop">Shop Now</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Product 4 -->
-        <div class="col-md-3 col-sm-6">
-          <div class="card h-100 text-center p-3">
-            <div class="card-body">
-              <h5 class="card-title">Potato Chips</h5>
-              <p class="card-text">₺37</p>
-              <a href="#" class="btn-shop">Shop Now</a>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </section>
