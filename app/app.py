@@ -1,4 +1,5 @@
-from flask import Flask, flash, redirect, render_template, request, url_for, session, Response
+import decimal
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for, session, Response
 import mysql.connector
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -146,11 +147,325 @@ def logout():
 
 @app.route('/cart')
 def cart():
-    return render_template("cart.html")
+    if 'user_email' not in session:
+        flash("You must be logged in to view your cart.")
+        return redirect(url_for('login'))
+
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+    email = session['user_email']
+
+    try:
+        # Get customer_id
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (email,))
+        customer = cursor.fetchone()
+        if not customer:
+            flash("Customer not found.")
+            return redirect(url_for('home'))
+
+        customer_id = customer['customer_id']
+
+        # Get open cart
+        cursor.execute("""
+            SELECT cart_id FROM cart 
+            WHERE customer_id = %s AND status = 'open'
+        """, (customer_id,))
+        cart = cursor.fetchone()
+        if not cart:
+            return render_template("cart.html", items=[], total=0)
+
+        cart_id = cart['cart_id']
+
+        # Get items in cart
+        cursor.execute("""
+            SELECT ci.cart_item_id, ci.quantity, p.name, p.price, (p.price * ci.quantity) AS total_price, p.product_id
+            FROM cartitem ci
+            JOIN product p ON ci.product_id = p.product_id
+            WHERE ci.cart_id = %s
+        """, (cart_id,))
+        items = cursor.fetchall()
+
+        subtotal = sum(item['total_price'] for item in items)
+        subtotal = decimal.Decimal(subtotal)  # ensure it's Decimal
+
+        # Conditional delivery fee logic
+        delivery_fee = decimal.Decimal("0.00") if subtotal >= decimal.Decimal("500.00") else decimal.Decimal("39.90")
+        total = subtotal + delivery_fee
+
+        return render_template("cart.html", items=items, total=total, delivery_fee=delivery_fee, subtotal=subtotal)
+
+    finally:
+        cursor.close()
+        db.close()
+
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    if 'user_email' not in session:
+        flash("You need to be logged in to add items to your cart.")
+        return redirect(url_for('login'))
+
+    product_id = request.form.get('product_id')
+    email = session['user_email']
+
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        # Get customer_id
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (email,))
+        customer = cursor.fetchone()
+        if not customer:
+            flash("Customer not found.")
+            return redirect(url_for('home'))
+
+        customer_id = customer[0]
+
+        # Check if an open cart exists
+        cursor.execute("""
+            SELECT cart_id FROM cart 
+            WHERE customer_id = %s AND status = 'open'
+        """, (customer_id,))
+        cart = cursor.fetchone()
+
+        if cart:
+            cart_id = cart[0]
+        else:
+            # Create a new cart
+            cursor.execute("""
+                INSERT INTO cart (created_date, status, customer_id)
+                VALUES (%s, 'open', %s)
+            """, (datetime.today().date(), customer_id))
+            db.commit()
+            cart_id = cursor.lastrowid
+
+        # Check if product already in cart
+        cursor.execute("""
+            SELECT cart_item_id, quantity FROM cartitem 
+            WHERE cart_id = %s AND product_id = %s
+        """, (cart_id, product_id))
+        item = cursor.fetchone()
+
+        if item:
+            # If exists, increase quantity
+            cursor.execute("""
+                UPDATE cartitem SET quantity = quantity + 1 
+                WHERE cart_item_id = %s
+            """, (item[0],))
+        else:
+            # Add new item
+            cursor.execute("""
+                INSERT INTO cartitem (quantity, cart_id, product_id)
+                VALUES (1, %s, %s)
+            """, (cart_id, product_id))
+        
+        db.commit()
+        flash("Item added to cart!")
+    except Exception as e:
+        print(e)
+        flash("An error occurred while adding to cart.")
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('home'))
+
+
+@app.route('/update_cart', methods=['POST'])
+def update_cart():
+    if 'user_email' not in session:
+        flash("Login required.")
+        return redirect(url_for('login'))
+
+    quantities = request.form.getlist('quantities')
+    cart_item_ids = request.form.getlist('quantities')
+
+    # Alternatively, if you use a dict-like name: quantities[cart_item_id]
+    # then use request.form.to_dict(flat=False)['quantities']
+    quantities_dict = request.form.to_dict(flat=False).get('quantities', {})
+
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        for cart_item_id, quantity in quantities_dict.items():
+            cart_item_id = int(cart_item_id)
+            quantity = int(quantity[0])
+            if quantity < 1:
+                cursor.execute("DELETE FROM cartitem WHERE cart_item_id = %s", (cart_item_id,))
+            else:
+                cursor.execute("UPDATE cartitem SET quantity = %s WHERE cart_item_id = %s", (quantity, cart_item_id))
+        db.commit()
+        flash("Cart updated successfully.")
+    except Exception as e:
+        print(e)
+        flash("Error updating cart.")
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('cart'))
+
+@app.route('/remove_item', methods=['POST'])
+def remove_item():
+    if 'user_email' not in session:
+        flash("Login required.")
+        return redirect(url_for('login'))
+
+    cart_item_id = request.form.get('cart_item_id')
+
+    db = get_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM cartitem WHERE cart_item_id = %s", (cart_item_id,))
+        db.commit()
+        flash("Item removed.")
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('cart'))
+
+@app.route('/clear_cart', methods=['POST'])
+def clear_cart():
+    if 'user_email' not in session:
+        flash("You must be logged in to clear your cart.")
+        return redirect(url_for('login'))
+
+    db = get_connection()
+    cursor = db.cursor()
+    email = session['user_email']
+
+    try:
+        # Get customer_id
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (email,))
+        customer = cursor.fetchone()
+        if not customer:
+            flash("Customer not found.")
+            return redirect(url_for('home'))
+
+        customer_id = customer[0]
+
+        # Get open cart
+        cursor.execute("""
+            SELECT cart_id FROM cart 
+            WHERE customer_id = %s AND status = 'open'
+        """, (customer_id,))
+        cart = cursor.fetchone()
+        if not cart:
+            flash("No active cart to clear.")
+            return redirect(url_for('cart'))
+
+        cart_id = cart[0]
+
+        # First, delete items from cartitem
+        cursor.execute("DELETE FROM cartitem WHERE cart_id = %s", (cart_id,))
+
+        # Then, delete the cart itself
+        cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
+
+        db.commit()
+        flash("Cart cleared successfully.")
+
+    except Exception as e:
+        print(e)
+        flash("An error occurred while clearing the cart.")
+
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('cart'))
+
+
+@app.route('/update_quantity', methods=['POST'])
+def update_quantity():
+    if 'user_email' not in session:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    cart_item_id = data.get('cart_item_id')
+    new_quantity = data.get('quantity')
+
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        if new_quantity <= 0:
+            cursor.execute("DELETE FROM cartitem WHERE cart_item_id = %s", (cart_item_id,))
+        else:
+            cursor.execute("UPDATE cartitem SET quantity = %s WHERE cart_item_id = %s", (new_quantity, cart_item_id))
+        db.commit()
+
+        # Recalculate total
+        cursor.execute("""
+            SELECT SUM(p.price * ci.quantity)
+            FROM cartitem ci
+            JOIN cart c ON ci.cart_id = c.cart_id
+            JOIN product p ON ci.product_id = p.product_id
+            WHERE c.customer_id = (
+                SELECT customer_id FROM customer WHERE email = %s
+            ) AND c.status = 'open'
+        """, (session['user_email'],))
+        total = cursor.fetchone()[0] or 0
+
+        return jsonify({'success': True, 'cart_total': total})
+
+    finally:
+        cursor.close()
+        db.close()
+        
+@app.route('/adjust_quantity', methods=['POST'])
+def adjust_quantity():
+    if 'user_email' not in session:
+        flash("Please log in first.")
+        return redirect(url_for('login'))
+
+    cart_item_id = request.form.get('cart_item_id')
+    action = request.form.get('action')
+
+    if not cart_item_id or action not in ('increase', 'decrease'):
+        flash("Invalid request.")
+        return redirect(url_for('cart'))
+
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        # Get current quantity
+        cursor.execute("SELECT quantity FROM cartitem WHERE cart_item_id = %s", (cart_item_id,))
+        row = cursor.fetchone()
+        if not row:
+            flash("Item not found.")
+            return redirect(url_for('cart'))
+
+        current_qty = row[0]
+        if action == 'increase' and current_qty < 10:
+            new_qty = current_qty + 1
+        elif action == 'decrease' and current_qty > 1:
+            new_qty = current_qty - 1
+        else:
+            new_qty = current_qty  # no change
+
+        cursor.execute("UPDATE cartitem SET quantity = %s WHERE cart_item_id = %s", (new_qty, cart_item_id))
+        db.commit()
+        flash("Quantity updated.")
+
+    except Exception as e:
+        print(e)
+        flash("Failed to update quantity.")
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('cart'))
+
+
+
 @app.route('/checkout')
 def checkout():
     return render_template("checkout.html")
 if __name__ == '__main__':
     app.run(debug=True)
+    
 
         
