@@ -1,9 +1,7 @@
-{% extends 'base.html' %}
-{% block title %}Cart{% endblock %}
-{% block content %}
+{% extends 'base.html' %} {% block title %}Cart{% endblock %} {% block content
+%}
 
 <main class="main">
-
   <!-- Page Title -->
   <div class="page-title light-background">
     <div class="container">
@@ -15,17 +13,17 @@
       </nav>
       <h1>Cart</h1>
     </div>
-  </div><!-- End Page Title -->
+  </div>
+  <!-- End Page Title -->
 
   <!-- Cart Section -->
+  
   <section id="cart" class="cart section">
     <div class="container" data-aos="fade-up" data-aos-delay="100">
       <div class="row">
-
         <!-- Cart Items -->
         <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
           <div class="cart-items">
-
             <div class="cart-header d-none d-lg-block">
               <div class="row align-items-center">
                 <div class="col-lg-6"><h5>Product</h5></div>
@@ -34,67 +32,114 @@
                 <div class="col-lg-2 text-center"><h5>Total</h5></div>
               </div>
             </div>
-
-            <!-- Sample Cart Item -->
-            {% for item in cart_items %}
-            <div class="cart-item">
-              <div class="row align-items-center">
-                <div class="col-lg-6 col-12 mb-3">
-                  <div class="product-info d-flex align-items-center">
-                    <div class="product-image">
-                      <img src="{{ url_for('static', filename=item.image) }}" alt="Product" class="img-fluid">
-                    </div>
-                    <div class="product-details">
-                      <h6 class="product-title">{{ item.title }}</h6>
-                      <div class="product-meta">
-                        <span class="product-color">Color: {{ item.color }}</span>
-                        <span class="product-size">Size: {{ item.size }}</span>
+            <form method="POST" action="{{ url_for('update_cart') }}">
+            
+              <!-- Sample Cart Item -->
+              {% for item in items %}
+              <div class="cart-item">
+                <div class="row align-items-center">
+                  <div class="col-lg-6 col-12 mb-3">
+                    <div class="product-info d-flex align-items-center">
+                      <div class="product-image">
+                        <img
+                          src="{{ url_for('product_image', product_id=item.product_id) }}"
+                          alt="Product"
+                          class="img-fluid"
+                        />
                       </div>
-                      <button class="remove-item" type="button">
-                        <i class="bi bi-trash"></i> Remove
-                      </button>
+                      <div class="product-details">
+                        <h6 class="product-title">{{ item.name }}</h6>
+                        <div class="product-meta">
+                          <span class="product-price"
+                            >Price: {{ item.price }}</span
+                          >
+                          <span class="product-size"
+                            >Quantity: {{ item.quantity }}</span
+                          >
+                        </div>
+                        <button class="remove-item" type="button">
+                          <i class="bi bi-trash"></i> Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-2 col-12 text-center">
-                  <span class="current-price">${{ item.price }}</span>
-                </div>
-                <div class="col-lg-2 col-12 text-center">
-                  <div class="quantity-selector">
-                    <button class="quantity-btn decrease"><i class="bi bi-dash"></i></button>
-                    <input type="number" class="quantity-input" value="{{ item.quantity }}" min="1" max="10">
-                    <button class="quantity-btn increase"><i class="bi bi-plus"></i></button>
+                  <div class="col-lg-2 col-12 text-center">
+                    <span class="current-price">${{ item.total_price }}</span>
                   </div>
-                </div>
-                <div class="col-lg-2 col-12 text-center">
-                  <span>${{ item.total }}</span>
+                  <div class="col-lg-2 col-12 text-center">
+                    <div class="quantity-selector">
+                      <form method="POST" action="{{ url_for('adjust_quantity') }}">
+                        <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
+                        <input type="hidden" name="action" value="decrease">
+                        <button type="submit" class="quantity-btn decrease btn btn-sm btn-outline-secondary">
+                          <i class="bi bi-dash"></i>
+                        </button>
+                      </form>
+                      <input
+                        type="number"
+                        class="quantity-input"
+                        value="{{ item.quantity }}"
+                        min="1"
+                        max="10"
+                      />
+                      <form method="POST" action="{{ url_for('adjust_quantity') }}">
+                        <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
+                        <input type="hidden" name="action" value="increase">
+                        <button type="submit" class="quantity-btn increase btn btn-sm btn-outline-secondary">
+                          <i class="bi bi-plus"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="col-lg-2 col-12 text-center">
+                    <span>${{ item.total_price }}</span>
+                  </div>
                 </div>
               </div>
+              {% endfor %}
+              <!-- End Sample -->
+              
+              <div class="text-end mt-4">
+                <button type="submit" class="btn btn-outline-heading me-2">
+                  <i class="bi bi-arrow-clockwise"></i> Update Cart
+                </button>
+            </form>
+              <form method="POST" action="{{ url_for('clear_cart') }}" style="display: inline;">
+                <button type="submit" class="btn btn-outline-remove">
+                  <i class="bi bi-trash"></i> Clear Cart
+                </button>
+              </form>
             </div>
-            {% endfor %}
-            <!-- End Sample -->
-
-          <div class="text-end mt-4">
-            <button class="btn btn-outline-heading me-2"><i class="bi bi-arrow-clockwise"></i> Update Cart</button>
-            <button class="btn btn-outline-remove"><i class="bi bi-trash"></i> Clear Cart</button>
-          </div>
-
-
           </div>
         </div>
 
         <!-- Summary -->
-        <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="300">
+        <div
+          class="col-lg-4 mt-4 mt-lg-0"
+          data-aos="fade-up"
+          data-aos-delay="300"
+        >
           <div class="cart-summary">
             <h4 class="summary-title">Order Summary</h4>
 
-            <div class="summary-item"><span class="summary-label">Subtotal</span><span class="summary-value">₺{{ subtotal }}</span></div>
+            <div class="summary-item">
+              <span class="summary-label">Subtotal</span
+              ><span class="summary-value">₺{{ subtotal }}</span>
+            </div>
             <div class="summary-item shipping-item">
               <span class="summary-label">Shipping</span>
               <div class="shipping-options text-end">
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="shipping" id="standard" checked>
-                  <label class="form-check-label" for="standard">Standard Delivery - ₺39.90</label>
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="shipping"
+                    id="standard"
+                    checked
+                  />
+                  <label class="form-check-label" for="standard"
+                    >Delivery Fee: {% if delivery_fee == 0 %}<span class="text-success">Free</span>{% else %}₺{{ delivery_fee }}{% endif %}</label
+                  >
                 </div>
               </div>
             </div>
@@ -111,17 +156,15 @@
             </div>
 
             <div class="continue-shopping">
-              <a href="{{ url_for('home') }}" class="btn btn-link w-100"><i class="bi bi-arrow-left"></i> Continue Shopping</a>
+              <a href="{{ url_for('home') }}" class="btn btn-link w-100"
+                ><i class="bi bi-arrow-left"></i> Continue Shopping</a
+              >
             </div>
-
           </div>
-
         </div>
-
       </div>
     </div>
   </section>
-
 </main>
 
 {% endblock %}

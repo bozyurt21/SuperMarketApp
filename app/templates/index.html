@@ -150,7 +150,14 @@
                 <div class="card-body">
                   <h5 class="card-title">{{ product[1] }}</h5>
                   <p class="card-text">₺{{ product[2] }}</p>
-                  <a href="#" class="btn-shop">Shop Now</a>
+                  <form method="POST" action="{{ url_for('add_to_cart') }}">
+                    <input
+                      type="hidden"
+                      name="product_id"
+                      value="{{ product[0] }}"
+                    />
+                    <button type="submit" class="btn-shop">Add to cart</button>
+                  </form>
                 </div>
               </div>
             </div>
