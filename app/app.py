@@ -18,6 +18,12 @@ def get_connection():
         password="0079306",
         database="supermarketApp"
     )
+    
+def loginDialog():
+    if 'user_email' not in session:
+        flash("Please log in first.")
+        return redirect(url_for('login'))
+    
 # To serve the image
 @app.route('/product_image/<int:product_id>')
 def product_image(product_id):
@@ -34,9 +40,10 @@ def product_image(product_id):
     else:
         return '', 404
 
+################################################### route codes #######################################################
 
-
-
+########################################### Login , register, logout ##################################################
+# Home
 @app.route('/')
 def home():
     db = get_connection()
@@ -45,7 +52,7 @@ def home():
     products = cursor.fetchall()
     return render_template('index.html', products = products)
 
-
+# Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -80,7 +87,7 @@ def login():
 
     return render_template('login.html')
 
-
+# Register
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     db = get_connection()
@@ -118,8 +125,20 @@ def register():
     cursor.close()
     db.close()
     return render_template('register.html')
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.')
+    return redirect(url_for('login'))
+############################################################################################################
+
+############################################# Adding Product ###############################################
+# Add Product to db
 @app.route('/addProduct', methods =['POST', 'GET'] )
 def addProduct():
+    loginDialog()
     db = get_connection()
     cursor = db.cursor()
     if request.method == "POST":
@@ -138,19 +157,13 @@ def addProduct():
     cursor.close()
     db.close()
     return render_template("addProduct.html", categories=categories)
+############################################################################################################
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out.')
-    return redirect(url_for('login'))
-
+################################################ Cart ######################################################
+# Cart
 @app.route('/cart')
 def cart():
-    if 'user_email' not in session:
-        flash("You must be logged in to view your cart.")
-        return redirect(url_for('login'))
-
+    loginDialog()
     db = get_connection()
     cursor = db.cursor(dictionary=True)
     email = session['user_email']
@@ -198,12 +211,10 @@ def cart():
         cursor.close()
         db.close()
 
+# Add product to cart
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    if 'user_email' not in session:
-        flash("You need to be logged in to add items to your cart.")
-        return redirect(url_for('login'))
-
+    loginDialog()
     product_id = request.form.get('product_id')
     email = session['user_email']
 
@@ -269,13 +280,10 @@ def add_to_cart():
 
     return redirect(url_for('home'))
 
-
+# Update the Cart
 @app.route('/update_cart', methods=['POST'])
 def update_cart():
-    if 'user_email' not in session:
-        flash("Login required.")
-        return redirect(url_for('login'))
-
+    loginDialog()
     quantities = request.form.getlist('quantities')
     cart_item_ids = request.form.getlist('quantities')
 
@@ -305,11 +313,10 @@ def update_cart():
 
     return redirect(url_for('cart'))
 
+# remove item
 @app.route('/remove_item', methods=['POST'])
 def remove_item():
-    if 'user_email' not in session:
-        flash("Login required.")
-        return redirect(url_for('login'))
+    loginDialog()
 
     cart_item_id = request.form.get('cart_item_id')
 
@@ -459,13 +466,178 @@ def adjust_quantity():
 
     return redirect(url_for('cart'))
 
+############################################################################################################
 
-
+############################################ Checkout ######################################################
 @app.route('/checkout')
 def checkout():
-    return render_template("checkout.html")
+    loginDialog()
+    email = session['user_email']
+
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        # Get customer_id
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (email,))
+        customer = cursor.fetchone()
+        if not customer:
+            flash("Customer not found.")
+            return redirect(url_for('home'))
+
+        customer_id = customer['customer_id']
+
+        # Get open cart
+        cursor.execute("""
+            SELECT cart_id FROM cart
+            WHERE customer_id = %s AND status = 'open'
+        """, (customer_id,))
+        cart = cursor.fetchone()
+
+        if not cart:
+            flash("Your cart is empty.")
+            return render_template("checkout.html", items=[], subtotal=0, delivery_fee=0, total=0)
+
+        cart_id = cart['cart_id']
+
+        # Get cart items
+        cursor.execute("""
+            SELECT ci.quantity, p.name, p.price, (ci.quantity * p.price) AS total_price,
+                   p.product_id
+            FROM cartitem ci
+            JOIN product p ON ci.product_id = p.product_id
+            WHERE ci.cart_id = %s
+        """, (cart_id,))
+        items = cursor.fetchall()
+
+        # Calculate subtotal
+        subtotal = sum(item['total_price'] for item in items)
+        subtotal = decimal.Decimal(subtotal)
+
+        # Calculate delivery fee
+        delivery_fee = decimal.Decimal("0.00") if subtotal >= decimal.Decimal("500.00") else decimal.Decimal("39.90")
+        total = subtotal + delivery_fee
+
+        return render_template("checkout.html", items=items, subtotal=subtotal, delivery_fee=delivery_fee, total=total)
+
+    finally:
+        cursor.close()
+        db.close()
+from werkzeug.security import generate_password_hash
+
+@app.route('/place_order', methods=['POST'])
+def place_order():
+    loginDialog()
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        email = session['user_email']
+
+        # Get customer_id
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (email,))
+        customer = cursor.fetchone()
+        if not customer:
+            flash("Customer not found.")
+            return redirect(url_for('checkout'))
+
+        customer_id = customer[0]
+
+        # Get active cart
+        cursor.execute("SELECT cart_id FROM cart WHERE customer_id = %s AND status = 'open'", (customer_id,))
+        cart = cursor.fetchone()
+        if not cart:
+            flash("No items in cart.")
+            return redirect(url_for('checkout'))
+
+        cart_id = cart[0]
+
+        # Get cart items
+        cursor.execute("""
+            SELECT ci.product_id, ci.quantity, p.name, p.price
+            FROM cartitem ci
+            JOIN product p ON ci.product_id = p.product_id
+            WHERE ci.cart_id = %s
+        """, (cart_id,))
+        cart_items = cursor.fetchall()
+
+        # Collect form data
+        fname = request.form.get('first-name')
+        lname = request.form.get('last-name')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        apartment = request.form.get('apartment')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        zip_code = request.form.get('zip')
+        country = request.form.get('country')
+        save_address = request.form.get('save-address') == 'on'
+
+        card_number = request.form.get('card-number')
+        exp_date = request.form.get('expiry')  # format MM/YY
+        card_name = request.form.get('card-name')
+
+        # Handle delivery fee
+        subtotal = sum(decimal.Decimal(qty) * decimal.Decimal(price) for (_, qty, _, price) in cart_items)
+        delivery_fee = decimal.Decimal("0.00") if subtotal >= decimal.Decimal("500.00") else decimal.Decimal("39.90")
+        total = subtotal + delivery_fee
+
+        # Insert into order_table
+        cursor.execute("""
+            INSERT INTO order_table (date, total_amount, delivery_id, status_id, customer_id)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (datetime.today().date(), total, 1, 1, customer_id))
+        db.commit()
+        order_id = cursor.lastrowid
+
+        # Save address
+        if save_address:
+            cursor.execute("""
+                INSERT INTO address (customer_id, zip_code, city, country, street, apt_no)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (customer_id, zip_code, city, country, address, apartment))
+
+        # Save credit card if info was filled (basic presence check)
+        if card_number and exp_date and card_name:
+            hashed_card = generate_password_hash(card_number)
+            cursor.execute("""
+                INSERT INTO credit_card (customer_id, card_number, exp_date, owner_name)
+                VALUES (%s, %s, STR_TO_DATE(%s, '%%m/%%y'), %s)
+            """, (customer_id, hashed_card, exp_date, card_name))
+
+        # Insert into order_detail
+        for (product_id, quantity, product_name, unit_price) in cart_items:
+            cursor.execute("""
+                INSERT INTO order_detail (
+                    order_id, product_id, fname, lname, email, pnum,
+                    quantity, unit_price
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (order_id, product_id, fname, lname, email, phone, quantity, unit_price))
+
+            # Log in `buys` table
+            cursor.execute("INSERT IGNORE INTO buys (customer_id, product_id) VALUES (%s, %s)",
+                           (customer_id, product_id))
+
+        # Mark cart as completed
+        cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
+        db.commit()
+
+        flash("Order placed successfully.")
+        return redirect(url_for('home'))
+
+    except Exception as e:
+        db.rollback()
+        print("Order error:", e)
+        flash("An error occurred while placing the order.")
+        return redirect(url_for('checkout'))
+
+    finally:
+        cursor.close()
+        db.close()
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     
 
-        
+############################################################################################################       
