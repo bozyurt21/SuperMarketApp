@@ -1,9 +1,6 @@
-{% extends 'base.html' %}
-{% block title %}Checkout{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Checkout{% endblock %} {% block
+content %}
 <main class="main">
-
   <!-- Page Title -->
   <div class="page-title light-background">
     <div class="container">
@@ -22,7 +19,6 @@
     <div class="container" data-aos="fade-up" data-aos-delay="100">
       <div class="row">
         <div class="col-lg-8">
-
           <!-- Step Indicators -->
           <div class="checkout-steps mb-4" data-aos="fade-up">
             <div class="step active" data-step="1">
@@ -49,34 +45,63 @@
           <!-- Checkout Forms -->
           <div class="checkout-forms" data-aos="fade-up" data-aos-delay="150">
             <!-- Step 1: Info -->
+            <form method="POST" action="{{ url_for('place_order') }}">
             <div class="checkout-form active" data-form="1">
               <div class="form-header">
                 <h3>Customer Information</h3>
                 <p>Please enter your contact details</p>
               </div>
-              <form>
                 <div class="row">
                   <div class="col-md-6 form-group">
                     <label for="first-name">First Name</label>
-                    <input type="text" id="first-name" class="form-control" required>
+                    <input
+                      type="text"
+                      id="first-name"
+                      class="form-control"
+                      name="first-name"
+                      required
+                    />
                   </div>
                   <div class="col-md-6 form-group">
                     <label for="last-name">Last Name</label>
-                    <input type="text" id="last-name" class="form-control" required>
+                    <input
+                      type="text"
+                      id="last-name"
+                      class="form-control"
+                      name="last-name"
+                      required
+                    />
                   </div>
                 </div>
                 <div class="form-group mt-3">
                   <label for="email">Email</label>
-                  <input type="email" id="email" class="form-control" required>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="form-group mt-3">
                   <label for="phone">Phone Number</label>
-                  <input type="tel" id="phone" class="form-control" required>
+                  <input
+                    type="phone2numeric"
+                    id="phone"
+                    name="phone"
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="text-end mt-4">
-                  <button type="button" class="btn btn-primary next-step" data-next="2">Continue to Shipping</button>
+                  <button
+                    type="button"
+                    class="btn btn-primary next-step"
+                    data-next="2"
+                  >
+                    Continue to Shipping
+                  </button>
                 </div>
-              </form>
             </div>
 
             <!-- Step 2: Shipping -->
@@ -85,49 +110,98 @@
                 <h3>Shipping Address</h3>
                 <p>Where should we deliver your order?</p>
               </div>
-              <form>
                 <div class="form-group">
                   <label for="address">Street Address</label>
-                  <input type="text" id="address" class="form-control" required>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="form-group mt-3">
                   <label for="apartment">Apartment (optional)</label>
-                  <input type="text" id="apartment" class="form-control">
+                  <input
+                    type="text"
+                    id="apartment"
+                    name="apartment"
+                    class="form-control"
+                  />
                 </div>
                 <div class="row mt-3">
                   <div class="col-md-4 form-group">
                     <label for="city">City</label>
-                    <input type="text" id="city" class="form-control" required>
+                    <input
+                      type="text"
+                      id="city"
+                      name="city"
+                      class="form-control"
+                      required
+                    />
                   </div>
                   <div class="col-md-4 form-group">
                     <label for="state">State</label>
-                    <input type="text" id="state" class="form-control" required>
+                    <input
+                      type="text"
+                      id="state"
+                      name="state"
+                      class="form-control"
+                      required
+                    />
                   </div>
                   <div class="col-md-4 form-group">
                     <label for="zip">ZIP Code</label>
-                    <input type="text" id="zip" class="form-control" required>
+                    <input
+                      type="text"
+                      id="zip"
+                      class="form-control"
+                      name="zip"
+                      required
+                    />
                   </div>
                 </div>
                 <div class="form-group mt-3">
                   <label for="country">Country</label>
-                  <select class="form-select" id="country" required>
+                  <select
+                    class="form-select"
+                    id="country"
+                    name="country"
+                    required
+                  >
                     <option value="">Select Country</option>
-                    <option value="US">United States</option>
                     <option value="TR">Turkey</option>
+                    <option value="US">United States</option>
                     <option value="DE">Germany</option>
                   </select>
                 </div>
                 <div class="form-check mt-3">
-                  <input class="form-check-input" type="checkbox" id="save-address">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="save-address"
+                    id="save-address"
+                  />
                   <label class="form-check-label" for="save-address">
                     Save this address
                   </label>
                 </div>
                 <div class="d-flex justify-content-between mt-4">
-                  <button type="button" class="btn btn-outline-secondary prev-step" data-prev="1">Back</button>
-                  <button type="button" class="btn btn-primary next-step" data-next="3">Continue to Payment</button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary prev-step"
+                    data-prev="1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary next-step"
+                    data-next="3"
+                  >
+                    Continue to Payment
+                  </button>
                 </div>
-              </form>
             </div>
 
             <!-- Step 3: Payment -->
@@ -135,35 +209,79 @@
               <div class="form-header">
                 <h3>Payment Method</h3>
               </div>
-              <form>
                 <div class="payment-method active">
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="payment-method" id="credit-card" checked>
-                    <label class="form-check-label" for="credit-card">Credit Card</label>
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="payment-method"
+                      name="payment-method"
+                      id="credit-card"
+                      checked
+                    />
+                    <label class="form-check-label" for="credit-card"
+                      >Credit Card</label
+                    >
                   </div>
                   <div class="payment-method-body mt-3">
                     <label for="card-number">Card Number</label>
-                    <input type="text" id="card-number" class="form-control" required>
+                    <input
+                      type="text"
+                      id="card-number"
+                      name="card-number"
+                      class="form-control"
+                      required
+                    />
                     <div class="row mt-3">
                       <div class="col-md-6">
                         <label for="expiry">Expiry</label>
-                        <input type="text" id="expiry" class="form-control" placeholder="MM/YY" required>
+                        <input
+                          type="text"
+                          id="expiry"
+                          name="expiry"
+                          class="form-control"
+                          placeholder="MM/YY"
+                          required
+                        />
                       </div>
                       <div class="col-md-6">
                         <label for="cvv">CVV</label>
-                        <input type="text" id="cvv" class="form-control" required>
+                        <input
+                          type="text"
+                          id="cvv"
+                          name="cvv"
+                          class="form-control"
+                          required
+                        />
                       </div>
                     </div>
                     <label class="mt-3" for="card-name">Name on Card</label>
-                    <input type="text" id="card-name" class="form-control" required>
+                    <input
+                      type="text"
+                      id="card-name"
+                      name="card-name"
+                      class="form-control"
+                      required
+                    />
                   </div>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                  <button type="button" class="btn btn-outline-secondary prev-step" data-prev="2">Back</button>
-                  <button type="button" class="btn btn-primary next-step" data-next="4">Review Order</button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary prev-step"
+                    data-prev="2"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary next-step"
+                    data-next="4"
+                  >
+                    Review Order
+                  </button>
                 </div>
-              </form>
             </div>
 
             <!-- Step 4: Review -->
@@ -171,7 +289,6 @@
               <div class="form-header">
                 <h3>Review Your Order</h3>
               </div>
-              <form>
                 <div class="review-sections">
                   <div class="review-section">
                     <h4>Contact Info</h4>
@@ -193,23 +310,38 @@
                 </div>
 
                 <div class="form-check mt-4">
-                  <input class="form-check-input" type="checkbox" id="terms" required>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="terms"
+                    required
+                  />
                   <label class="form-check-label" for="terms">
-                    I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+                    I agree to the <a href="#">Terms</a> and
+                    <a href="#">Privacy Policy</a>
                   </label>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                  <button type="button" class="btn btn-outline-secondary prev-step" data-prev="3">Back</button>
-                  <button type="submit" class="btn btn-success place-order-btn">Place Order</button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary prev-step"
+                    data-prev="3"
+                  >
+                    Back
+                  </button>
+                  <button type="submit" class="btn btn-success place-order-btn">
+                    Place Order
+                  </button>
                 </div>
-              </form>
+            </form>
             </div>
           </div>
         </div>
 
+
         <!-- Order Summary -->
-<!-- Order Summary -->
+        <!-- Order Summary -->
         <div class="col-lg-4">
           <div class="order-summary" data-aos="fade-left" data-aos-delay="200">
             <div class="order-summary-header">
@@ -217,35 +349,97 @@
             </div>
             <div class="order-summary-content">
               <div class="order-items">
+                {% for item in items %}
                 <div class="order-item">
-                  <img src="{{ url_for('static', filename='img/product/product-1.webp') }}" alt="" class="img-fluid">
+                  <img
+                    src="{{ url_for('product_image', product_id=item.product_id) }}"
+                    alt=""
+                    class="img-fluid"
+                    style="width: 60px; height: 60px; object-fit: cover"
+                  />
                   <div class="order-item-details">
-                    <h4>Wireless Headphones</h4>
-                    <span>1 × ₺89.99</span>
+                    <h4>{{ item.name }}</h4>
+                    <span>{{ item.quantity }} × ₺{{ item.price }}</span>
                   </div>
                 </div>
-                <div class="order-item">
-                  <img src="{{ url_for('static', filename='img/product/product-2.webp') }}" alt="" class="img-fluid">
-                  <div class="order-item-details">
-                    <h4>Smart Watch</h4>
-                    <span>2 × ₺59.99</span>
-                  </div>
-                </div>
+                {% endfor %}
               </div>
 
               <div class="order-totals">
-                <div class="d-flex justify-content-between"><span>Subtotal</span><span>₺209.97</span></div>
-                <div class="d-flex justify-content-between"><span>Shipping</span><span>Standard Delivery - ₺39.90</span></div>
-                <div class="d-flex justify-content-between fw-bold"><span>Total</span><span>₺249.87</span></div>
+                <div class="d-flex justify-content-between">
+                  <span>Subtotal</span><span>₺{{ subtotal }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Shipping</span>
+                  <span>
+                    {% if delivery_fee == 0 %} Free {% else %} ₺{{ delivery_fee
+                    }} {% endif %}
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between fw-bold">
+                  <span>Total</span><span>₺{{ total }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- Optional: Terms and Privacy Modal -->
     </div>
   </section>
 </main>
+<script>
+  document.querySelectorAll(".next-step").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = button.closest(".checkout-form");
+      const nextStep = button.getAttribute("data-next");
+      current.classList.remove("active");
+      document
+        .querySelector(`.checkout-form[data-form="${nextStep}"]`)
+        .classList.add("active");
+    });
+  });
+  document.querySelectorAll(".prev-step").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = button.closest(".checkout-form");
+      const prevStep = button.getAttribute("data-prev");
+      current.classList.remove("active");
+      document
+        .querySelector(`.checkout-form[data-form="${prevStep}"]`)
+        .classList.add("active");
+    });
+  });
+</script>
+
+<script>
+  function updateReviewSection() {
+    // Contact Info
+    document.querySelector(".review-name").textContent =
+      document.getElementById("first-name").value + " " + document.getElementById("last-name").value;
+    document.querySelector(".review-email").textContent =
+      document.getElementById("email").value;
+    document.querySelector(".review-phone").textContent =
+      document.getElementById("phone").value;
+
+    // Shipping Address
+    const address = document.getElementById("address").value;
+    const apartment = document.getElementById("apartment").value;
+    const city = document.getElementById("city").value;
+    const country = document.getElementById("country").value;
+    document.querySelector(".review-section:nth-of-type(2) p:nth-of-type(1)").textContent =
+      address + (apartment ? ", " + apartment : "");
+    document.querySelector(".review-section:nth-of-type(2) p:nth-of-type(2)").textContent =
+      city + ", " + country;
+
+    // Payment (masked)
+    const card = document.getElementById("card-number").value;
+    const ending = card.slice(-4);
+    document.querySelector(".review-section:nth-of-type(3) p").textContent =
+      "Credit Card ending in " + ending;
+  }
+
+  document.querySelector('[data-next="4"]').addEventListener("click", updateReviewSection);
+</script>
+
 {% endblock %}
