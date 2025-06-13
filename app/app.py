@@ -19,10 +19,7 @@ def get_connection():
         database="supermarketApp"
     )
     
-def loginDialog():
-    if 'user_email' not in session:
-        flash("Please log in first.")
-        return redirect(url_for('login'))
+
     
 # To serve the image
 @app.route('/product_image/<int:product_id>')
@@ -43,6 +40,17 @@ def product_image(product_id):
 ################################################### route codes #######################################################
 
 ########################################### Login , register, logout ##################################################
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.')
+    return redirect(url_for('login'))
+
+def loginDialog():
+    if 'user_email' not in session:
+        flash("Please log in first.")
+        return redirect(url_for('login'))
 # Home
 @app.route('/')
 def home():
@@ -126,12 +134,7 @@ def register():
     db.close()
     return render_template('register.html')
 
-# Logout
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out.')
-    return redirect(url_for('login'))
+
 ############################################################################################################
 
 ############################################# Adding Product ###############################################
@@ -551,6 +554,7 @@ def place_order():
             return redirect(url_for('checkout'))
 
         cart_id = cart[0]
+        print(cart_id)
 
         # Get cart items
         cursor.execute("""
@@ -560,6 +564,7 @@ def place_order():
             WHERE ci.cart_id = %s
         """, (cart_id,))
         cart_items = cursor.fetchall()
+        print("No problem in cartitem")
 
         # Collect form data
         fname = request.form.get('first-name')
@@ -584,11 +589,12 @@ def place_order():
 
         # Insert into order_table
         cursor.execute("""
-            INSERT INTO order_table (date, total_amount, delivery_id, status_id, customer_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (datetime.today().date(), total, 1, 1, customer_id))
+            INSERT INTO order_table (date, total_amount, customer_id)
+            VALUES (%s, %s, %s)
+        """, (datetime.today().date(), total, customer_id))
         db.commit()
         order_id = cursor.lastrowid
+        print("No problem in order_table")
 
         # Save address
         if save_address:
@@ -596,31 +602,34 @@ def place_order():
                 INSERT INTO address (customer_id, zip_code, city, country, street, apt_no)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (customer_id, zip_code, city, country, address, apartment))
+        print("No problem in address")
 
         # Save credit card if info was filled (basic presence check)
         if card_number and exp_date and card_name:
             hashed_card = generate_password_hash(card_number)
             cursor.execute("""
                 INSERT INTO credit_card (customer_id, card_number, exp_date, owner_name)
-                VALUES (%s, %s, STR_TO_DATE(%s, '%%m/%%y'), %s)
+                VALUES (%s, %s, %s, %s)
             """, (customer_id, hashed_card, exp_date, card_name))
-
         # Insert into order_detail
         for (product_id, quantity, product_name, unit_price) in cart_items:
             cursor.execute("""
                 INSERT INTO order_detail (
-                    order_id, product_id, fname, lname, email, pnum,
+                    order_id, order_status_id, product_id, fname, lname, email, pnum, zip_code, city, country, street, apt_no,
                     quantity, unit_price
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (order_id, product_id, fname, lname, email, phone, quantity, unit_price))
-
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (order_id, 1, product_id, fname, lname, email, phone, zip_code, city, country, state, apartment, quantity, unit_price))
+            print("No problem in order_detail")
             # Log in `buys` table
             cursor.execute("INSERT IGNORE INTO buys (customer_id, product_id) VALUES (%s, %s)",
                            (customer_id, product_id))
+        print("No problem in buys")
 
         # Mark cart as completed
-        cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
+        cursor.execute("UPDATE cart SET status = %s WHERE cart_id = %s", ('close', cart_id))
+        # TODO: We need to update the product quantity after the purchase!!!
         db.commit()
+        print("No problem in delete cart")
 
         flash("Order placed successfully.")
         return redirect(url_for('home'))
@@ -630,6 +639,60 @@ def place_order():
         print("Order error:", e)
         flash("An error occurred while placing the order.")
         return redirect(url_for('checkout'))
+
+    finally:
+        cursor.close()
+        db.close()
+
+##################################################### Purchase Page #############################################
+@app.route('/purchase')
+def purchase():
+    loginDialog()
+    email = session['user_email']
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        # Get customer ID
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (email,))
+        customer = cursor.fetchone()
+        if not customer:
+            flash("Customer not found.")
+            return redirect(url_for('home'))
+
+        customer_id = customer['customer_id']
+
+        # Get Open Order Items
+        cursor.execute("""
+            SELECT od.order_id, od.product_id, p.name, p.price, od.quantity,
+                   (od.quantity * p.price) AS total_price,
+                   ot.date AS order_date, os.status_name
+            FROM order_table ot
+            JOIN order_detail od ON ot.order_id = od.order_id
+            JOIN product p ON od.product_id = p.product_id
+            JOIN order_status os ON od.order_status_id = os.status_id
+            WHERE ot.customer_id = %s AND os.status_name = 'open'
+            ORDER BY ot.date DESC
+        """, (customer_id,))
+        open_order_items = cursor.fetchall()
+
+        # Get Past Order Items
+        cursor.execute("""
+            SELECT od.order_id, od.product_id, p.name, p.price, od.quantity,
+                   (od.quantity * p.price) AS total_price,
+                   ot.date AS order_date, os.status_name
+            FROM order_table ot
+            JOIN order_detail od ON ot.order_id = od.order_id
+            JOIN product p ON od.product_id = p.product_id
+            JOIN order_status os ON od.order_status_id = os.status_id
+            WHERE ot.customer_id = %s AND os.status_name != 'open'
+            ORDER BY ot.date DESC
+        """, (customer_id,))
+        past_order_items = cursor.fetchall()
+
+        return render_template("purchases.html",
+                               open_orders=open_order_items,
+                               past_orders=past_order_items)
 
     finally:
         cursor.close()
