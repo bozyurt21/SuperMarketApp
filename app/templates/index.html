@@ -52,37 +52,34 @@
     <div class="container mt-4">
       <h2 class="text-center mb-4">Products</h2>
       <div class="row">
+        
         <!-- Filter Sidebar -->
-        <div class="col-lg-3 mb-4">
-          <div class="card p-3">
-            <h5 class="mb-3 text-center">Filter Products</h5>
-            <form method="GET">
+        <aside class="col-lg-3 mb-4">
+          <div class="card p-4 shadow-sm">
+            <h5 class="text-center mb-4">Filter Products</h5>
+            <form method="GET" action="{{ url_for('get_products') }}">
               <!-- Category Filter -->
               <div class="mb-3">
-                <label for="category" class="form-label">Category</label>
-                <select class="form-select" name="category" id="category">
+                <label for="category_id" class="form-label">Category</label>
+                <select name="category_id" id="category_id" class="form-select">
                   <option value="">All</option>
-                  <option value="Bakery">Bakery</option>
-                  <option value="Beverages">Beverages</option>
-                  <option value="Dairy">Dairy</option>
-                  <option value="Fruits">Fruits</option>
-                  <option value="Snacks">Snacks</option>
-                  <option value="Vegetables">Vegetables</option>
-                  <option value="Meat">Meat</option>
-                  <option value="Seafood">Seafood</option>
-                  <option value="Frozen">Frozen</option>
-                  <option value="Canned">Canned</option>
+                  {% for cat in categories %}
+                    <option value="{{ cat.category_id }}" {% if request.args.get("category_id") == cat.category_id|string %}selected{% endif %}>
+                      {{ cat.name }}
+                    </option>
+                  {% endfor %}
                 </select>
               </div>
-
+  
+  
               <!-- Price Filter -->
               <div class="mb-3">
-                <label class="form-label">Price Range</label>
-                <div class="d-flex">
+                <label class="form-label">Price Range (₺)</label>
+                <div class="d-flex gap-2">
                   <input
                     type="number"
                     name="price_min"
-                    class="form-control me-2"
+                    class="form-control"
                     placeholder="Min"
                     min="0"
                   />
@@ -95,68 +92,69 @@
                   />
                 </div>
               </div>
-
+  
               <!-- Sort By -->
               <div class="mb-3">
                 <label for="sort" class="form-label">Sort By</label>
-                <select class="form-select" name="sort" id="sort">
+                <select name="sort" id="sort" class="form-select">
                   <option value="popularity">Most Popular</option>
                   <option value="newest">Newest</option>
                   <option value="price_asc">Price: Low to High</option>
                   <option value="price_desc">Price: High to Low</option>
                 </select>
               </div>
-              <div class="form-check mt-3">
+  
+              <!-- Save Filter Option -->
+              <div class="form-check mb-2">
                 <input
                   class="form-check-input"
                   type="checkbox"
-                  name="save_filter"
                   id="save_filter"
+                  name="save_filter"
                 />
-                <label class="form-check-label" for="save_filter"
-                  >Save this filter</label
-                >
+                <label class="form-check-label" for="save_filter">
+                  Save this filter
+                </label>
               </div>
               <input
                 type="text"
                 name="filter_name"
-                class="form-control mt-2"
+                class="form-control mb-3"
                 placeholder="Name this filter"
               />
-              <button
-                type="submit"
-                class="btn-shop w-100"
-                style="padding-top: 10px"
-              >
+  
+              <button type="submit" class="btn btn-shop w-100">
                 Apply Filters
               </button>
             </form>
-            <h5 style="text-align: center; padding: 10px">Saved Filters</h5>
+  
+            <!-- Saved Filters Placeholder -->
+            <hr class="my-4" />
+            <h6 class="text-center">Saved Filters</h6>
+            <!-- You can list saved filters here in the future -->
           </div>
-        </div>
-
+        </aside>
+  
         <!-- Products Grid -->
         <div class="col-lg-9">
           <div class="row g-4">
             {% for product in products %}
             <div class="col-md-4 col-sm-6">
-              <div class="card h-100 text-center p-3">
+              <div class="card h-100 text-center shadow-sm p-3">
                 <img
-                  src="{{ url_for('product_image', product_id=product[0]) }}"
+                  src="{{ url_for('product_image', product_id=product.product_id) }}"
                   class="card-img-top"
-                  alt="{{ product[1] }}"
+                  alt="{{ product.name }}"
                   style="height: 200px; object-fit: cover"
                 />
                 <div class="card-body">
-                  <h5 class="card-title">{{ product[1] }}</h5>
-                  <p class="card-text">₺{{ product[2] }}</p>
+                  <h5 class="card-title">{{ product.name }}</h5>
+                  <p class="card-text">₺{{ product.price }}</p>
                   <form method="POST" action="{{ url_for('add_to_cart') }}">
-                    <input
-                      type="hidden"
-                      name="product_id"
-                      value="{{ product[0] }}"
-                    />
-                    <button type="submit" class="btn-shop">Add to cart</button>
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}" />
+                    <button type="submit" class="btn btn-shop mt-2">
+                      Add to cart
+                    </button>
                   </form>
                 </div>
               </div>
@@ -164,6 +162,7 @@
             {% endfor %}
           </div>
         </div>
+  
       </div>
     </div>
   </section>

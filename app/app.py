@@ -15,7 +15,7 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="0079306",
+        password="Elbistan1034@.",
         database="supermarketApp"
     )
     
@@ -55,7 +55,7 @@ def loginDialog():
 @app.route('/')
 def home():
     db = get_connection()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM product;")
     products = cursor.fetchall()
     return render_template('index.html', products = products)
@@ -479,6 +479,7 @@ def checkout():
 
     db = get_connection()
     cursor = db.cursor(dictionary=True)
+    
 
     try:
         # Get customer_id
@@ -533,6 +534,7 @@ def place_order():
     loginDialog()
     db = get_connection()
     cursor = db.cursor()
+    print(request.form)
 
     try:
         email = session['user_email']
@@ -697,6 +699,80 @@ def purchase():
     finally:
         cursor.close()
         db.close()
+
+@app.route('/get_products', methods=['GET'])
+def get_products():
+    db = get_connection()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        # Fetch filters from query string
+        category_id = request.args.get('category_id')
+        price_min = request.args.get('price_min')
+        price_max = request.args.get('price_max')
+        sort = request.args.get('sort')
+
+        if sort == 'popularity':
+            query = """
+                SELECT 
+                    p.product_id, p.name, p.price, SUM(od.quantity) AS total_sold
+                FROM product p
+                JOIN order_detail od ON p.product_id = od.product_id
+                WHERE 1=1
+            """
+        else:
+            query = "SELECT product_id, name, price FROM product WHERE 1=1"
+
+        params = []
+
+        # Category filter
+        if category_id:
+            query += " AND p.category_id = %s" if sort == 'popularity' else " AND category_id = %s"
+            params.append(category_id)
+
+        # Price range filters
+        if price_min:
+            query += " AND p.price >= %s" if sort == 'popularity' else " AND price >= %s"
+            params.append(price_min)
+        if price_max:
+            query += " AND p.price <= %s" if sort == 'popularity' else " AND price <= %s"
+            params.append(price_max)
+
+        # Sorting
+        if sort == 'price_asc':
+            query += " ORDER BY price ASC"
+        elif sort == 'price_desc':
+            query += " ORDER BY price DESC"
+        elif sort == 'newest':
+            query += " ORDER BY product_id DESC"
+        elif sort == 'popularity':
+            query += """
+                GROUP BY p.product_id, p.name, p.price
+                HAVING SUM(od.quantity) > 0
+                ORDER BY total_sold DESC
+            """
+        else:
+            query += " ORDER BY product_id DESC"  # Fallback to newest
+
+        cursor.execute(query, tuple(params))
+        products = cursor.fetchall()
+
+
+        # Fetch all categories for dropdown
+        cursor.execute("SELECT category_id, name FROM category")
+        categories = cursor.fetchall()
+
+        return render_template('index.html', products=products, categories=categories)
+
+    except Exception as e:
+        print("Error fetching products:", e)
+        flash("Unable to load products.")
+        return render_template('index.html', products=[], categories=[])
+
+    finally:
+        cursor.close()
+        db.close()
+
 
 
 if __name__ == '__main__':
