@@ -15,7 +15,7 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="Elbistan1034@.",
+        password="0079306",
         database="supermarketApp"
     )
     
@@ -614,24 +614,26 @@ def place_order():
                 VALUES (%s, %s, %s, %s)
             """, (customer_id, hashed_card, exp_date, card_name))
         # Insert into order_detail
-        for (product_id, quantity, product_name, unit_price) in cart_items:
+        for (product_id, quantity, unit_price) in cart_items:
             cursor.execute("""
                 INSERT INTO order_detail (
                     order_id, order_status_id, product_id, fname, lname, email, pnum, zip_code, city, country, street, apt_no,
                     quantity, unit_price
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (order_id, 1, product_id, fname, lname, email, phone, zip_code, city, country, state, apartment, quantity, unit_price))
-            print("No problem in order_detail")
+            # TODO: We need to update the product quantity after the purchase!!!
+            cursor.execute("UPDATE product SET quantity = quantity - %s WHERE product_id= %s", (quantity, product_id))
             # Log in `buys` table
             cursor.execute("INSERT IGNORE INTO buys (customer_id, product_id) VALUES (%s, %s)",
                            (customer_id, product_id))
         print("No problem in buys")
 
         # Mark cart as completed
-        cursor.execute("UPDATE cart SET status = %s WHERE cart_id = %s", ('close', cart_id))
-        # TODO: We need to update the product quantity after the purchase!!!
+
+        cursor.execute("UPDATE cart SET status = %s WHERE cart_id = %s", ('open', cart_id))
+        
         db.commit()
-        print("No problem in delete cart")
+
 
         flash("Order placed successfully.")
         return redirect(url_for('home'))
@@ -699,6 +701,44 @@ def purchase():
     finally:
         cursor.close()
         db.close()
+
+@app.route('/delivered', methods=['POST'])
+def delivered():
+    if 'user_email' not in session:
+        flash("You must be logged in to confirm delivery.")
+        return redirect(url_for('login'))
+
+    product_id = request.form.get('product_id')
+    order_id = request.form.get('order_id')
+
+    if not product_id or not order_id:
+        flash("Missing order or product information.")
+        return redirect(url_for('purchase'))
+
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        # Update the order_status_id for the delivered item (assuming '2' is the ID for 'close')
+        cursor.execute("""
+            UPDATE order_detail 
+            SET order_status_id = 2 
+            WHERE order_id = %s AND product_id = %s
+        """, (order_id, product_id))
+        db.commit()
+
+        flash("Order marked as delivered.")
+
+    except Exception as e:
+        print("Error updating delivery status:", e)
+        db.rollback()
+        flash("Failed to update delivery status.")
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('purchase'))
+
 
 @app.route('/get_products', methods=['GET'])
 def get_products():
