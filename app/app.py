@@ -15,7 +15,7 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="Elbistan1034@.",
+        password="0079306",
         database="supermarketApp"
     )
     
@@ -621,17 +621,21 @@ def place_order():
                     quantity, unit_price
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (order_id, 1, product_id, fname, lname, email, phone, zip_code, city, country, state, apartment, quantity, unit_price))
-            print("No problem in order_detail")
+            print("Nothing is wrong on order detail")
+            # TODO: We need to update the product quantity after the purchase!!!
+            cursor.execute("UPDATE product SET stock = stock - %s WHERE product_id= %s", (quantity, product_id))
+            print("Product updated successfully")
             # Log in `buys` table
             cursor.execute("INSERT IGNORE INTO buys (customer_id, product_id) VALUES (%s, %s)",
                            (customer_id, product_id))
         print("No problem in buys")
 
         # Mark cart as completed
-        cursor.execute("UPDATE cart SET status = %s WHERE cart_id = %s", ('close', cart_id))
-        # TODO: We need to update the product quantity after the purchase!!!
+
+        cursor.execute("UPDATE cart SET status = %s WHERE cart_id = %s", ('closed', cart_id))
+        
         db.commit()
-        print("No problem in delete cart")
+
 
         flash("Order placed successfully.")
         return redirect(url_for('home'))
@@ -673,7 +677,7 @@ def purchase():
             JOIN order_detail od ON ot.order_id = od.order_id
             JOIN product p ON od.product_id = p.product_id
             JOIN order_status os ON od.order_status_id = os.status_id
-            WHERE ot.customer_id = %s AND os.status_name = 'open'
+            WHERE ot.customer_id = %s AND os.status_name != 'delivered'
             ORDER BY ot.date DESC
         """, (customer_id,))
         open_order_items = cursor.fetchall()
@@ -687,7 +691,7 @@ def purchase():
             JOIN order_detail od ON ot.order_id = od.order_id
             JOIN product p ON od.product_id = p.product_id
             JOIN order_status os ON od.order_status_id = os.status_id
-            WHERE ot.customer_id = %s AND os.status_name != 'open'
+            WHERE ot.customer_id = %s AND os.status_name != 'closed'
             ORDER BY ot.date DESC
         """, (customer_id,))
         past_order_items = cursor.fetchall()
@@ -699,6 +703,44 @@ def purchase():
     finally:
         cursor.close()
         db.close()
+
+@app.route('/delivered', methods=['POST'])
+def delivered():
+    if 'user_email' not in session:
+        flash("You must be logged in to confirm delivery.")
+        return redirect(url_for('login'))
+
+    product_id = request.form.get('product_id')
+    order_id = request.form.get('order_id')
+
+    if not product_id or not order_id:
+        flash("Missing order or product information.")
+        return redirect(url_for('purchase'))
+
+    db = get_connection()
+    cursor = db.cursor()
+
+    try:
+        # Update the order_status_id for the delivered item (assuming '2' is the ID for 'close')
+        cursor.execute("""
+            UPDATE order_detail 
+            SET order_status_id = 2 
+            WHERE order_id = %s AND product_id = %s
+        """, (order_id, product_id))
+        db.commit()
+
+        flash("Order marked as delivered.")
+
+    except Exception as e:
+        print("Error updating delivery status:", e)
+        db.rollback()
+        flash("Failed to update delivery status.")
+    finally:
+        cursor.close()
+        db.close()
+
+    return redirect(url_for('purchase'))
+
 
 @app.route('/get_products', methods=['GET'])
 def get_products():

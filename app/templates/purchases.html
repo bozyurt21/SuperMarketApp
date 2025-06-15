@@ -5,32 +5,39 @@ content %}
     <div class="col-lg-12" data-aos="fade-up" data-aos-delay="200">
       <h2 class="mb-4">Open Orders</h2>
       {% if open_orders %} {% for item in open_orders %}
-      <div class="cart-item mb-4 border-bottom pb-3">
-        <div class="row align-items-center">
-          <div class="col-lg-6 col-12 mb-3">
-            <div class="product-info d-flex align-items-center">
-              <div class="product-image me-3">
-                <img
-                  src="{{ url_for('product_image', product_id=item.product_id) }}"
-                  alt="Product"
-                  class="img-fluid"
-                  width="80"
-                />
-              </div>
-              <div class="product-details">
-                <h6 class="product-title">{{ item.name }}</h6>
-                <div class="product-meta">
-                  <span>Price: ${{ item.price }}</span><br />
-                  <span>Quantity: {{ item.quantity }}</span><br />
-                  <span>Total: ${{ item.total_price }}</span><br />
-                  <span>Order Date: {{ item.order_date }}</span>
+      <form method="POST" action="{{ url_for('delivered') }}">
+        <input type="hidden" name="product_id" value="{{ item.product_id }}" />
+        <input type="hidden" name="order_id" value="{{ item.order_id }}" />
+        <div class="cart-item mb-4 border-bottom pb-3">
+          <div class="row align-items-center">
+            <div class="col-lg-6 col-12 mb-3">
+              <div class="product-info d-flex align-items-center">
+                <div class="product-image me-3">
+                  <img
+                    src="{{ url_for('product_image', product_id=item.product_id) }}"
+                    alt="Product"
+                    class="img-fluid"
+                    width="80"
+                  />
+                </div>
+                <div class="product-details">
+                  <h6 class="product-title">{{ item.name }}</h6>
+                  <div class="product-meta">
+                    <span>Price: ${{ item.price }}</span><br />
+                    <span>Quantity: {{ item.quantity }}</span><br />
+                    <span>Total: ${{ item.total_price }}</span><br />
+                    <span>Order Date: {{ item.order_date }}</span>
+                  </div>
+                  <button type="submit" class="btn btn-shop mt-2">
+                    Delivered
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      {% endfor %} {% else %}
+        {% endfor %} {% else %}
+      </form>
       <p>No open orders.</p>
       {% endif %}
 
