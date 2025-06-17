@@ -16,7 +16,7 @@ def get_connection():
         host="localhost",
         user="root",
         password="0079306",
-        database="supermarketApp"
+        database="supermarket"
     )
    
 
