@@ -16,9 +16,9 @@ def get_connection():
         host="localhost",
         user="root",
         password="0079306",
-        database="supermarketApp"
+        database="supermarket"
     )
-    
+   
 
     
 # To serve the image
@@ -58,7 +58,118 @@ def home():
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM product;")
     products = cursor.fetchall()
-    return render_template('index.html', products = products)
+    
+    ###################################################### Advance Queries ######################################################
+    ### Most Sold Products Per Category
+    # Get Most Sold Products Per Category
+    cursor.execute("""
+        SELECT 
+            p.category_id,
+            c.name AS category_name,
+            p.product_id,
+            p.name AS product_name,
+            p.price AS price,
+            p.stock AS stock,
+            SUM(od.quantity) AS total_sold
+        FROM product p
+        JOIN order_detail od ON p.product_id = od.product_id
+        JOIN category c ON p.category_id = c.category_id
+        GROUP BY p.category_id, p.product_id
+        HAVING total_sold = (
+            SELECT MAX(inner_total) FROM (
+                SELECT SUM(od2.quantity) AS inner_total
+                FROM product p2
+                JOIN order_detail od2 ON p2.product_id = od2.product_id
+                WHERE p2.category_id = p.category_id
+                GROUP BY p2.product_id
+            ) AS inner_query
+        )
+        ORDER BY category_name;
+    """)
+    most_sold_per_category = cursor.fetchall()
+    
+    
+    # Get Most Popular Categories
+    cursor.execute("""
+        SELECT 
+            cat.category_id,
+            cat.name AS category_name,
+            SUM(od.quantity) AS total_items_sold
+        FROM category cat
+        JOIN product p ON cat.category_id = p.category_id
+        JOIN order_detail od ON p.product_id = od.product_id
+        GROUP BY cat.category_id
+        ORDER BY total_items_sold DESC
+        LIMIT 1;
+    """)
+    popular_category = cursor.fetchall()
+    
+    # Get Frequently Bought Together Pairs
+    cursor.execute("""
+        SELECT 
+    p1.product_id AS product1_id,
+    p1.name AS product1_name,
+    p1.price AS product1_price,
+    p1.stock AS product1_stock,
+    p2.product_id AS product2_id,
+    p2.name AS product2_name,
+    p2.price AS product2_price,
+    p2.stock AS product2_stock,
+    COUNT(*) AS times_bought_together
+FROM order_detail od1
+JOIN order_detail od2 
+    ON od1.order_id = od2.order_id 
+    AND od1.product_id < od2.product_id
+JOIN product p1 ON od1.product_id = p1.product_id
+JOIN product p2 ON od2.product_id = p2.product_id
+GROUP BY p1.product_id, p2.product_id
+ORDER BY times_bought_together DESC
+LIMIT 10;
+    """)
+    bought_together = cursor.fetchall()
+    
+    # Personalized Recommendations (if logged in)
+    user_recommendations = []
+    if 'user_email' in session:
+        cursor.execute("SELECT customer_id FROM customer WHERE email = %s", (session['user_email'],))
+        customer = cursor.fetchone()
+        if customer:
+            customer_id = customer['customer_id']
+            cursor.execute("""
+                SELECT DISTINCT p.product_id, p.name, p.price
+                FROM product p
+                WHERE p.category_id IN (
+                    SELECT DISTINCT p2.category_id
+                    FROM order_detail od
+                    JOIN product p2 ON od.product_id = p2.product_id
+                    JOIN order_table ot ON od.order_id = ot.order_id
+                    WHERE ot.customer_id = %s
+                )
+                ORDER BY RAND()
+                LIMIT 5;
+            """, (customer_id,))
+            user_recommendations = cursor.fetchall()
+    # Top 5 Spending Customers
+    cursor.execute("""
+        SELECT 
+            c.customer_id,
+            CONCAT(c.fname, ' ', c.lname) AS full_name,
+            c.email,
+            SUM(o.total_amount) AS total_spent
+        FROM customer c
+        JOIN order_table o ON c.customer_id = o.customer_id
+        GROUP BY c.customer_id
+        ORDER BY total_spent DESC
+        LIMIT 5;
+    """)
+    top_customers = cursor.fetchall()
+
+    
+    return render_template('index.html', products = products, most_sold_per_category=most_sold_per_category,
+        popular_category=popular_category,
+        bought_together=bought_together,
+        user_recommendations=user_recommendations, 
+        top_customers = top_customers)
 
 # Login
 @app.route('/login', methods=['GET', 'POST'])
