@@ -32,12 +32,12 @@ git remote add origin <ssh-link>
 
 ## How to Import/ Export db
 
-# Export DB
+### Export DB
 ```
 mysqldump -u user_name -p db_name > path/to/file_name.sql
 ```
 
-# Import DB
+### Import DB
 ```
 mysql -u user_name -p db_name < path/to/file_name.sql
 ```
