@@ -2,7 +2,9 @@
 
 # Contents:
 
+
 - [Beginner Guide](#beginner-guide)
+- [How to Import/ Export db](#how-to-import-export-db)
 - [How To Run The App](#how-to-run-the-app)
 - [Jinja Syntax for Beginners](#jinja-syntax)
 - [HTML Beginning](#html-beginning)
@@ -28,7 +30,17 @@ git push origin <branch-name>
 git remote add origin <ssh-link>
 ```
 
+## How to Import/ Export db
 
+# Export DB
+```
+mysqldump -u user_name -p db_name > path/to/file_name.sql
+```
+
+# Import DB
+```
+mysql -u user_name -p db_name < path/to/file_name.sql
+```
 ## How To Run The App
 
 ```
