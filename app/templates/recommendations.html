@@ -1,0 +1,153 @@
+{%extends 'base.html'%}{%block title%}Recommendations{%endblock%}{%block
+content%}
+<section id="best-sellers" class="py-5">
+    <div class="container mt-4">
+      <h4 class="text-center mb-4"> 🏆 Most Popular Category is <span style="font-weight: 900;">{{popular_category[0].category_name}}🏆</span></h4>
+      <h4 class="text-center mb-4"> ♥️ Top Customer is <span style="font-weight: 900;">{{top_customers[0].full_name}} </span>with total spend of <span style="font-weight: 900;">{{top_customers[0].total_spent}}</span>♥️</h4>
+      <div class="row">
+        <div class="col-lg-9">
+          <div class="row g-4">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!--Most Sold Products-->
+  <section id="best-sellers" class="py-5">
+    <div class="container mt-4">
+      <h2 class="text-center mb-4">Most Sold Products Per Category</h2>
+      <div class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-2">
+            {% for product in most_sold_per_category %}
+            <div class="card text-center shadow-sm p-3 flex-shrink-0" style="width: 280px;">
+              <div class="card h-100 text-center shadow-sm p-3">
+                <img
+                  src="{{ url_for('product_image', product_id=product.product_id) }}"
+                  class="card-img-top"
+                  alt="{{ product.name }}"
+                  style="height: 200px; object-fit: cover"
+                />
+                <div class="card-body">
+                  <h4 class="card-title">{{ product.category_name }}</h4>
+                  <h5 class="card-title">{{ product.product_name }}</h5>
+
+                  <p class="card-text">₺{{ product.price }}</p>
+                  <p class="card-text">Stock: {{ product.stock }}</p>
+                  <form method="POST" action="{{ url_for('add_to_cart') }}">
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}" />
+                    <button type="submit" class="btn btn-shop mt-2">
+                      Add to cart
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <div class="d-flex overflow-auto gap-4 px-2" style="scroll-snap-type: x mandatory;">
+    <!-- Inside each product pair -->
+    <div style="scroll-snap-align: start; padding: 5rem;">
+      <!-- bundle card here -->
+      <section id="frequently-bought-together" class="py-5 bg-light">
+        <div class="container mt-4" style="margin: 3rem;">
+          <h2 class="text-center mb-4">Users Bought Together</h2>
+      
+          <!-- Horizontal scroll wrapper -->
+          <div class="d-flex overflow-auto gap-4 px-2">
+            {% for product in bought_together %}
+            <div class="d-flex flex-column flex-shrink-0 bg-white border rounded p-3 shadow" style="min-width: 500px;">
+      
+              <div class="d-flex justify-content-around">
+                <!-- Product 1 -->
+                <div class="text-center me-3">
+                  <img
+                    src="{{ url_for('product_image', product_id=product.product1_id) }}"
+                    class="img-fluid mb-2"
+                    alt="{{ product.product1_name }}"
+                    style="width: 120px; height: 120px; object-fit: cover;"
+                  />
+                    <h5 class="card-title">{{ product.product1_name }}</h5>
+  
+                    <p class="card-text">₺{{ product.product1_price }}</p>
+                    <p class="card-text">Stock: {{ product.product1_stock }}</p>
+                    <form method="POST" action="{{ url_for('add_to_cart') }}">
+                      <input type="hidden" name="product_id" value="{{ product.product1_id }}" />
+                      <button type="submit" class="btn btn-shop mt-2">
+                        Add to cart
+                      </button>
+                    </form>
+                  </div>
+      
+                <!-- Product 2 -->
+                <div class="text-center me-3">
+                  <img
+                    src="{{ url_for('product_image', product_id=product.product2_id) }}"
+                    class="img-fluid mb-2"
+                    alt="{{ product.product2_name }}"
+                    style="width: 120px; height: 120px; object-fit: cover;"
+                  />
+                    <h5 class="card-title">{{ product.product2_name }}</h5>
+  
+                    <p class="card-text">₺{{ product.product2_price }}</p>
+                    <p class="card-text">Stock: {{ product.product2_stock }}</p>
+                    <form method="POST" action="{{ url_for('add_to_cart') }}">
+                      <input type="hidden" name="product_id" value="{{ product.product2_id }}" />
+                      <button type="submit" class="btn btn-shop mt-2">
+                        Add to cart
+                      </button>
+                    </form>
+                  </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+      
+    </div>
+  </div>
+      
+        
+        
+
+  <section id="best-sellers" class="py-5">
+    <div class="container mt-4">
+      <h2 class="text-center mb-4">We Recommend You To Buy</h2>
+      <div class="d-flex flex-row flex-nowrap overflow-auto gap-3 px-2">
+            {% for product in most_sold_per_category %}
+            <div class="col-md-4 col-sm-6">
+              <div class="card h-100 text-center shadow-sm p-3">
+                <img
+                  src="{{ url_for('product_image', product_id=product.product_id) }}"
+                  class="card-img-top"
+                  alt="{{ product.name }}"
+                  style="height: 200px; object-fit: cover"
+                />
+                <div class="card-body">
+                  <h5 class="card-title">{{ product.product_name }}</h5>
+
+                  <p class="card-text">₺{{ product.price }}</p>
+                  <p class="card-text">Stock: {{ product.stock }}</p>
+                  <form method="POST" action="{{ url_for('add_to_cart') }}">
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}" />
+                    <button type="submit" class="btn btn-shop mt-2">
+                      Add to cart
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </section>
+{%endblock%}
